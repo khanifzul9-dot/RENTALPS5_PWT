@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operasional — Rental PS5 PWK</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #00e5ff;
+    --accent-dim: rgba(0,229,255,0.1);
+    --green: #00c853;
+    --green-dim: rgba(0,200,83,0.1);
+    --yellow: #ffd600;
+    --yellow-dim: rgba(255,214,0,0.1);
+    --red: #ff1744;
+    --red-dim: rgba(255,23,68,0.1);
+    --orange: #ff6d00;
+    --orange-dim: rgba(255,109,0,0.1);
+    --text: #f0f0f0;
+    --muted: #888;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--orange); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .logo span { color: var(--orange); }
+
+  .today-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-family: var(--mono); color: var(--muted); }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 24px; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; }
+  .tab { padding: 8px 20px; border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--muted); transition: all 0.15s; font-family: var(--font); }
+  .tab.active { background: var(--orange); color: #fff; font-weight: 700; }
+  .tab:not(.active):hover { color: var(--text); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+  /* DELIVERY CARD */
+  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+
+  .delivery-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .delivery-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .delivery-type { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .delivery-type.antar { color: var(--accent); }
+  .delivery-type.jemput { color: var(--orange); }
+
+  .delivery-count { font-size: 11px; color: var(--muted); background: var(--surface2); border-radius: 20px; padding: 3px 10px; }
+
+  .checklist-section { padding: 16px 18px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+  .check-item.done { opacity: 0.5; }
+
+  .check-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+
+  .check-item.done .check-box {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  .check-text { font-size: 13px; line-height: 1.5; }
+  .check-text .check-title { font-weight: 600; margin-bottom: 2px; }
+  .check-text .check-desc { font-size: 11px; color: var(--muted); }
+
+  .check-item.done .check-text .check-title { text-decoration: line-through; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { padding: 12px 18px; background: var(--surface2); display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width 0.3s ease; }
+  .progress-label { font-size: 12px; font-family: var(--mono); font-weight: 600; color: var(--green); width: 36px; text-align: right; }
+
+  /* UNIT INSPECTION */
+  .inspect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+
+  .inspect-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .inspect-card:hover { border-color: var(--accent); }
+  .inspect-card.selected { border-color: var(--orange); background: var(--orange-dim); }
+
+  .inspect-unit { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .inspect-name { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+
+  .inspect-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .inspect-status-dot.ok { background: var(--green); }
+  .inspect-status-dot.warn { background: var(--yellow); }
+  .inspect-status-dot.bad { background: var(--red); }
+
+  .inspect-status-text { font-size: 12px; font-weight: 600; }
+
+  /* INSPECTION FORM */
+  .inspect-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .inspect-form.open { display: block; }
+
+  .inspect-form-title { font-size: 15px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+
+  .inspect-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+  .inspect-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+  }
+
+  .inspect-item-label { font-size: 13px; font-weight: 600; }
+  .inspect-item-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .condition-btns { display: flex; gap: 6px; }
+  .cond-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+  .cond-btn.ok.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .cond-btn.warn.active { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+  .cond-btn.bad.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+
+  .inspect-note-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    outline: none;
+    resize: vertical;
+    min-height: 70px;
+    margin-bottom: 14px;
+  }
+
+  .inspect-note-area:focus { border-color: var(--orange); }
+
+  .submit-inspect { width: 100%; padding: 11px; background: var(--orange); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+
+  /* LOG TABLE */
+  .log-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .log-table { width: 100%; border-collapse: collapse; }
+  .log-table th { text-align: left; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .log-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tbody tr:hover { background: var(--surface2); }
+
+  .cond-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .cond-ok { background: var(--green-dim); color: var(--green); }
+  .cond-warn { background: var(--yellow-dim); color: var(--yellow); }
+  .cond-bad { background: var(--red-dim); color: var(--red); }
+
+  /* QUICK REPORT */
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .report-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .report-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  .report-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .report-row:last-child { border-bottom: none; }
+  .report-row span:last-child { font-weight: 600; }
+
+  /* SOP BOX */
+  .sop-grid { display: flex; flex-direction: column; gap: 12px; }
+  .sop-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .sop-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer; }
+  .sop-icon { font-size: 20px; }
+  .sop-title { font-size: 14px; font-weight: 700; flex: 1; }
+  .sop-toggle { color: var(--muted); font-size: 16px; transition: transform 0.2s; }
+  .sop-card.open .sop-toggle { transform: rotate(180deg); }
+  .sop-body { display: none; }
+  .sop-card.open .sop-body { display: block; }
+  .sop-step { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .sop-step:last-child { border-bottom: none; }
+  .sop-num { font-family: var(--mono); font-weight: 700; color: var(--orange); flex-shrink: 0; width: 24px; }
+  .sop-step-text { line-height: 1.6; color: var(--muted); }
+  .sop-step-text strong { color: var(--text); }
+
+  /* ADD DELIVERY FORM */
+  .add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 24px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; transition: border-color 0.15s; width: 100%; }
+  input:focus, select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-dim); }
+  .submit-btn { width: 100%; padding: 11px; background: var(--orange); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); margin-top: 14px; }
+
+  @media (max-width: 640px) {
+    .delivery-grid { grid-template-columns: 1fr; }
+    .inspect-grid { grid-template-columns: 1fr 1fr; }
+    .report-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🚗</div>
+    Ops <span>PS5</span> PWK
+  </div>
+  <div class="today-badge" id="today-badge">—</div>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('harian')">Harian</button>
+    <button class="tab" onclick="switchTab('inspeksi')">Inspeksi Unit</button>
+    <button class="tab" onclick="switchTab('log')">Log</button>
+    <button class="tab" onclick="switchTab('sop')">SOP</button>
+  </div>
+
+  <!-- HARIAN -->
+  <div class="panel active" id="panel-harian">
+
+    <div class="section-header">
+      <div class="section-title">Checklist Antar Jemput Hari Ini</div>
+      <button class="tab" style="background:var(--orange);color:#fff;font-weight:700" onclick="switchTab('inspeksi')">+ Jadwal Baru</button>
+    </div>
+
+    <div class="delivery-grid">
+
+      <!-- ANTAR -->
+      <div class="delivery-card">
+        <div class="delivery-header">
+          <div class="delivery-type antar">📦 Pengiriman (Antar)</div>
+          <div class="delivery-count" id="antar-count">0 jadwal</div>
+        </div>
+        <div class="checklist-section" id="antar-list">
+          <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Tidak ada pengiriman hari ini.</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-track"><div class="progress-fill" id="antar-progress" style="width:0%"></div></div>
+          <div class="progress-label" id="antar-pct">0%</div>
+        </div>
+      </div>
+
+      <!-- JEMPUT -->
+      <div class="delivery-card">
+        <div class="delivery-header">
+          <div class="delivery-type jemput">🔙 Penjemputan (Kembali)</div>
+          <div class="delivery-count" id="jemput-count">0 jadwal</div>
+        </div>
+        <div class="checklist-section" id="jemput-list">
+          <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Tidak ada penjemputan hari ini.</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-track"><div class="progress-fill" id="jemput-progress" style="width:0%"></div></div>
+          <div class="progress-label" id="jemput-pct">0%</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAMBAH JADWAL -->
+    <div class="section-title">Tambah Jadwal Hari Ini</div>
+    <div class="add-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Jenis</label>
+          <select id="jadwal-jenis">
+            <option value="antar">📦 Antar (Kirim ke Penyewa)</option>
+            <option value="jemput">🔙 Jemput (Ambil dari Penyewa)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="jadwal-unit">
+            <option value="UNIT-01">UNIT-01</option>
+            <option value="UNIT-02">UNIT-02</option>
+            <option value="UNIT-03">UNIT-03</option>
+            <option value="UNIT-04">UNIT-04</option>
+            <option value="UNIT-05">UNIT-05</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nama Penyewa</label>
+          <input type="text" id="jadwal-nama" placeholder="Nama penyewa">
+        </div>
+        <div class="form-group">
+          <label>No. WA Penyewa</label>
+          <input type="text" id="jadwal-wa" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="form-group full">
+          <label>Alamat</label>
+          <input type="text" id="jadwal-alamat" placeholder="Alamat lengkap">
+        </div>
+        <div class="form-group">
+          <label>Estimasi Jam</label>
+          <input type="time" id="jadwal-jam" value="10:00">
+        </div>
+        <div class="form-group">
+          <label>Catatan</label>
+          <input type="text" id="jadwal-catatan" placeholder="Opsional">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addJadwal()">+ Tambah Jadwal</button>
+    </div>
+
+  </div>
+
+  <!-- INSPEKSI UNIT -->
+  <div class="panel" id="panel-inspeksi">
+
+    <div class="section-title">Pilih Unit untuk Inspeksi</div>
+    <div class="inspect-grid">
+      <div class="inspect-card" onclick="selectUnit('UNIT-01')" id="icard-UNIT-01">
+        <div class="inspect-unit">UNIT-01</div>
+        <div class="inspect-name">PS5 Slim #1</div>
+        <div><span class="inspect-status-dot ok"></span><span class="inspect-status-text" style="color:var(--green)">Belum diinspeksi</span></div>
+      </div>
+      <div class="inspect-card" onclick="selectUnit('UNIT-02')" id="icard-UNIT-02">
+        <div class="inspect-unit">UNIT-02</div>
+        <div class="inspect-name">PS5 Slim #2</div>
+        <div><span class="inspect-status-dot ok"></span><span class="inspect-status-text" style="color:var(--green)">Belum diinspeksi</span></div>
+      </div>
+      <div class="inspect-card" onclick="selectUnit('UNIT-03')" id="icard-UNIT-03">
+        <div class="inspect-unit">UNIT-03</div>
+        <div class="inspect-name">PS5 Slim #3</div>
+        <div><span class="inspect-status-dot ok"></span><span class="inspect-status-text" style="color:var(--green)">Belum diinspeksi</span></div>
+      </div>
+      <div class="inspect-card" onclick="selectUnit('UNIT-04')" id="icard-UNIT-04">
+        <div class="inspect-unit">UNIT-04</div>
+        <div class="inspect-name">PS5 Slim #4</div>
+        <div><span class="inspect-status-dot ok"></span><span class="inspect-status-text" style="color:var(--green)">Belum diinspeksi</span></div>
+      </div>
+      <div class="inspect-card" onclick="selectUnit('UNIT-05')" id="icard-UNIT-05">
+        <div class="inspect-unit">UNIT-05</div>
+        <div class="inspect-name">PS5 Slim #5</div>
+        <div><span class="inspect-status-dot ok"></span><span class="inspect-status-text" style="color:var(--green)">Belum diinspeksi</span></div>
+      </div>
+    </div>
+
+    <!-- FORM INSPEKSI -->
+    <div class="inspect-form" id="inspect-form">
+      <div class="inspect-form-title">
+        <span>🔍</span>
+        <span id="inspect-form-title">Inspeksi —</span>
+      </div>
+
+      <div class="inspect-items">
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Konsol PS5</div>
+            <div class="inspect-item-desc">Bodi, ventilasi, port USB/HDMI</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('konsol','ok',this)">✓ OK</button>
+            <button class="cond-btn warn" onclick="setCondition('konsol','warn',this)">⚠ Lecet</button>
+            <button class="cond-btn bad" onclick="setCondition('konsol','bad',this)">✗ Rusak</button>
+          </div>
+        </div>
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Controller (2 buah)</div>
+            <div class="inspect-item-desc">Joystick, tombol, charging port, trigger</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('controller','ok',this)">✓ OK</button>
+            <button class="cond-btn warn" onclick="setCondition('controller','warn',this)">⚠ Drift</button>
+            <button class="cond-btn bad" onclick="setCondition('controller','bad',this)">✗ Rusak</button>
+          </div>
+        </div>
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Monitor</div>
+            <div class="inspect-item-desc">Layar, stand, kabel HDMI & power</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('monitor','ok',this)">✓ OK</button>
+            <button class="cond-btn warn" onclick="setCondition('monitor','warn',this)">⚠ Baret</button>
+            <button class="cond-btn bad" onclick="setCondition('monitor','bad',this)">✗ Rusak</button>
+          </div>
+        </div>
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Game Fisik (3 kaset)</div>
+            <div class="inspect-item-desc">Cek kelengkapan & kondisi cakram</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('game','ok',this)">✓ Lengkap</button>
+            <button class="cond-btn warn" onclick="setCondition('game','warn',this)">⚠ Baret</button>
+            <button class="cond-btn bad" onclick="setCondition('game','bad',this)">✗ Hilang</button>
+          </div>
+        </div>
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Kabel & Aksesoris</div>
+            <div class="inspect-item-desc">Kabel power, HDMI, charging controller</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('kabel','ok',this)">✓ Lengkap</button>
+            <button class="cond-btn warn" onclick="setCondition('kabel','warn',this)">⚠ Kurang</button>
+            <button class="cond-btn bad" onclick="setCondition('kabel','bad',this)">✗ Hilang</button>
+          </div>
+        </div>
+        <div class="inspect-item">
+          <div>
+            <div class="inspect-item-label">Akun PS / PS Plus</div>
+            <div class="inspect-item-desc">Login normal, library game accessible</div>
+          </div>
+          <div class="condition-btns">
+            <button class="cond-btn ok" onclick="setCondition('akun','ok',this)">✓ Normal</button>
+            <button class="cond-btn warn" onclick="setCondition('akun','warn',this)">⚠ Error</button>
+            <button class="cond-btn bad" onclick="setCondition('akun','bad',this)">✗ Kena Ban</button>
+          </div>
+        </div>
+      </div>
+
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Catatan Tambahan</label>
+      <textarea class="inspect-note-area" id="inspect-note" placeholder="Catat kerusakan spesifik, nomor seri hilang, dll..."></textarea>
+
+      <div style="display:flex;gap:10px">
+        <select id="inspect-waktu" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;font-family:var(--font);outline:none">
+          <option value="sebelum">📦 Inspeksi SEBELUM dikirim</option>
+          <option value="sesudah">🔙 Inspeksi SESUDAH dikembalikan</option>
+        </select>
+        <button class="submit-inspect" style="flex:1" onclick="submitInspeksi()">Simpan Inspeksi</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LOG -->
+  <div class="panel" id="panel-log">
+
+    <div class="report-grid">
+      <div class="report-card">
+        <div class="report-title">📊 Ringkasan Hari Ini</div>
+        <div class="report-row"><span>Total Pengiriman</span><span id="log-antar">0</span></div>
+        <div class="report-row"><span>Total Penjemputan</span><span id="log-jemput">0</span></div>
+        <div class="report-row"><span>Inspeksi Selesai</span><span id="log-inspeksi">0</span></div>
+        <div class="report-row"><span>Unit Bermasalah</span><span id="log-masalah" style="color:var(--red)">0</span></div>
+      </div>
+      <div class="report-card">
+        <div class="report-title">⚠️ Perlu Perhatian</div>
+        <div id="perlu-perhatian">
+          <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Tidak ada masalah tercatat hari ini.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Log Inspeksi</div>
+    <div class="log-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Waktu</th>
+            <th>Unit</th>
+            <th>Jenis</th>
+            <th>Konsol</th>
+            <th>Controller</th>
+            <th>Monitor</th>
+            <th>Catatan</th>
+          </tr>
+        </thead>
+        <tbody id="log-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Belum ada log inspeksi.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- SOP -->
+  <div class="panel" id="panel-sop">
+    <div class="section-title">SOP Operasional Harian</div>
+    <div class="sop-grid" id="sop-grid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let jadwalList = JSON.parse(localStorage.getItem('ps5_jadwal') || '[]');
+  let inspeksiLog = JSON.parse(localStorage.getItem('ps5_inspeksi') || '[]');
+  let selectedUnit = null;
+  let conditions = {};
+
+  const SOPS = [
+    {
+      icon: '📦',
+      title: 'SOP Pengiriman Unit (Antar)',
+      steps: [
+        { text: '<strong>Cek jadwal booking</strong> — konfirmasi ulang via WA penyewa 1 jam sebelum antar. Pastikan alamat dan jam benar.' },
+        { text: '<strong>Inspeksi unit SEBELUM antar</strong> — jalankan cek di tab Inspeksi. Foto kondisi unit dari 4 sisi (depan, belakang, kiri, kanan).' },
+        { text: '<strong>Siapkan kelengkapan</strong> — PS5, monitor, 2 controller, 3 game fisik, kabel power, kabel HDMI, kabel charging controller. Masukkan ke tas/kardus.' },
+        { text: '<strong>Foto paket lengkap</strong> sebelum diantarkan sebagai bukti kondisi awal.' },
+        { text: '<strong>Antar ke lokasi</strong> — pastikan penyewa yang terima, bukan orang lain. Minta tanda terima lewat balas WA "unit diterima".' },
+        { text: '<strong>Demo singkat</strong> — nyalain PS5, pastikan jalan normal di lokasi penyewa sebelum pulang.' },
+        { text: '<strong>Catat di sistem</strong> — tandai jadwal antar sebagai selesai.' }
+      ]
+    },
+    {
+      icon: '🔙',
+      title: 'SOP Penjemputan Unit (Kembali)',
+      steps: [
+        { text: '<strong>Konfirmasi H-1</strong> — WA penyewa sehari sebelum tanggal kembali. "Besok unit dijemput ya, jam berapa bisa?"' },
+        { text: '<strong>Jemput tepat waktu</strong> — kalau penyewa minta extended sewa, langsung hitung biaya tambahan dan konfirmasi pembayaran dulu.' },
+        { text: '<strong>Cek kelengkapan di lokasi</strong> — PS5, monitor, 2 controller, 3 game fisik, semua kabel. Jangan langsung pulang sebelum cek.' },
+        { text: '<strong>Inspeksi kondisi</strong> — periksa ada kerusakan baru atau tidak. Bandingkan dengan foto waktu antar.' },
+        { text: '<strong>Kalau ada kerusakan</strong> — foto, catat, diskusi dengan penyewa di tempat. Potong dari deposit sesuai kesepakatan.' },
+        { text: '<strong>Refund deposit</strong> — kalau semua aman, transfer deposit kembali ke penyewa setelah unit kembali ke tangan.' },
+        { text: '<strong>Catat di sistem</strong> — update status unit jadi tersedia, log inspeksi sesudah kembali.' }
+      ]
+    },
+    {
+      icon: '🔍',
+      title: 'SOP Inspeksi Unit',
+      steps: [
+        { text: '<strong>Konsol PS5</strong> — cek bodi (lecet, retak, penyok), semua port (HDMI, USB, disc slot), ventilasi tidak tersumbat.' },
+        { text: '<strong>Controller</strong> — cek joystick kiri dan kanan (drift test: gerak sendiri saat dilepas = drift). Cek semua tombol, trigger, dan charging port.' },
+        { text: '<strong>Monitor</strong> — nyalakan, cek dead pixel, baret layar, stand goyang atau tidak, semua port berfungsi.' },
+        { text: '<strong>Game fisik</strong> — cek 3 kaset lengkap, cakram tidak baret parah, bisa dibaca PS5.' },
+        { text: '<strong>Kabel</strong> — kabel power (tidak terkelupas), HDMI (tidak bengkok/patah), charging controller (2 buah).' },
+        { text: '<strong>Akun PS</strong> — login PS Store normal, PS Plus aktif, library game bisa diakses.' }
+      ]
+    },
+    {
+      icon: '⚠️',
+      title: 'SOP Penanganan Kerusakan',
+      steps: [
+        { text: '<strong>Dokumentasi dulu</strong> — foto/video kerusakan sebelum diskusi dengan penyewa. Ini bukti utama.' },
+        { text: '<strong>Kategorikan kerusakan</strong> — (A) Wajar/normal: lecet kecil, tidak kena deposit. (B) Kelalaian: kerusakan yang bisa dihindari, kena potongan deposit. (C) Parah: butuh servis, penyewa menanggung biaya.' },
+        { text: '<strong>Biaya servis referensi</strong> — Controller drift: Rp 80–150rb. Kabel HDMI baru: Rp 50rb. Game fisik hilang: Rp 700rb–1jt/kaset. Monitor retak: Rp 300rb+.' },
+        { text: '<strong>Konfirmasi dengan penyewa</strong> — tunjukkan foto, jelaskan kerusakannya, sepakati potongan sebelum refund.' },
+        { text: '<strong>Langsung servis</strong> — jangan tunda. Unit yang rusak = unit tidak menghasilkan. Target maksimal 2 hari servis.' }
+      ]
+    },
+    {
+      icon: '📱',
+      title: 'SOP Komunikasi via WA',
+      steps: [
+        { text: '<strong>Konfirmasi booking</strong> — "Halo [nama], booking PS5 [unit] [tanggal] sudah kami terima. Deposit Rp 200rb mohon ditransfer ke [rekening]. Kirim bukti + foto KTP + selfie holding KTP ya."' },
+        { text: '<strong>H-1 pengiriman</strong> — "Besok unit kami antar ke [alamat] sekitar jam [jam]. Pastikan ada di rumah ya!"' },
+        { text: '<strong>Saat antar</strong> — minta penyewa balas "unit PS5 [unit] sudah saya terima dalam kondisi baik" sebagai konfirmasi tertulis.' },
+        { text: '<strong>H-1 jemput</strong> — "Besok unit kami jemput ya [nama]. Mohon siapkan semua kelengkapannya: PS5, monitor, 2 controller, 3 kaset game, dan semua kabel."' },
+        { text: '<strong>Setelah jemput aman</strong> — "Unit sudah kami terima kembali, kondisi aman. Deposit Rp 200rb sudah kami transfer balik ke [nomor]. Terima kasih!"' }
+      ]
+    }
+  ];
+
+  function switchTab(name) {
+    const tabs = ['harian','inspeksi','log','sop'];
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'log') renderLog();
+    if (name === 'sop') renderSOP();
+  }
+
+  function getTodayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function addJadwal() {
+    const jenis = document.getElementById('jadwal-jenis').value;
+    const unit = document.getElementById('jadwal-unit').value;
+    const nama = document.getElementById('jadwal-nama').value.trim();
+    const wa = document.getElementById('jadwal-wa').value.trim();
+    const alamat = document.getElementById('jadwal-alamat').value.trim();
+    const jam = document.getElementById('jadwal-jam').value;
+    const catatan = document.getElementById('jadwal-catatan').value;
+
+    if (!nama || !alamat) { alert('Nama penyewa dan alamat wajib diisi!'); return; }
+
+    jadwalList.push({ id: Date.now(), jenis, unit, nama, wa, alamat, jam, catatan, tgl: getTodayStr(), done: false });
+    localStorage.setItem('ps5_jadwal', JSON.stringify(jadwalList));
+
+    document.getElementById('jadwal-nama').value = '';
+    document.getElementById('jadwal-wa').value = '';
+    document.getElementById('jadwal-alamat').value = '';
+    document.getElementById('jadwal-catatan').value = '';
+
+    renderHarian();
+  }
+
+  function toggleDone(id) {
+    const item = jadwalList.find(j => j.id === id);
+    if (item) { item.done = !item.done; }
+    localStorage.setItem('ps5_jadwal', JSON.stringify(jadwalList));
+    renderHarian();
+  }
+
+  function renderHarian() {
+    const today = getTodayStr();
+    const todayJadwal = jadwalList.filter(j => j.tgl === today);
+    const antar = todayJadwal.filter(j => j.jenis === 'antar');
+    const jemput = todayJadwal.filter(j => j.jenis === 'jemput');
+
+    renderDeliveryList('antar', antar);
+    renderDeliveryList('jemput', jemput);
+  }
+
+  function renderDeliveryList(type, list) {
+    const el = document.getElementById(type + '-list');
+    const count = document.getElementById(type + '-count');
+    const progress = document.getElementById(type + '-progress');
+    const pct = document.getElementById(type + '-pct');
+
+    count.textContent = list.length + ' jadwal';
+
+    if (!list.length) {
+      el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Tidak ada ' + (type === 'antar' ? 'pengiriman' : 'penjemputan') + ' hari ini.</div>';
+      progress.style.width = '0%';
+      pct.textContent = '0%';
+      return;
+    }
+
+    const doneCount = list.filter(j => j.done).length;
+    const pctVal = Math.round((doneCount / list.length) * 100);
+    progress.style.width = pctVal + '%';
+    pct.textContent = pctVal + '%';
+
+    el.innerHTML = list.map(j => `
+      <div class="check-item ${j.done ? 'done' : ''}" onclick="toggleDone(${j.id})">
+        <div class="check-box">${j.done ? '✓' : ''}</div>
+        <div class="check-text">
+          <div class="check-title">${j.unit} — ${j.nama}</div>
+          <div class="check-desc">📍 ${j.alamat} · ⏰ ${j.jam}${j.catatan ? ' · '+j.catatan : ''}</div>
+          ${j.wa ? '<div class="check-desc">📱 ' + j.wa + '</div>' : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  function selectUnit(unitId) {
+    selectedUnit = unitId;
+    conditions = {};
+    document.querySelectorAll('.inspect-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('icard-' + unitId).classList.add('selected');
+    document.getElementById('inspect-form').classList.add('open');
+    document.getElementById('inspect-form-title').textContent = 'Inspeksi — ' + unitId;
+    document.getElementById('inspect-note').value = '';
+    // Reset condition buttons
+    document.querySelectorAll('.cond-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  function setCondition(part, value, btn) {
+    conditions[part] = value;
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.cond-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function submitInspeksi() {
+    if (!selectedUnit) { alert('Pilih unit dulu!'); return; }
+    const required = ['konsol','controller','monitor','game','kabel','akun'];
+    const missing = required.filter(r => !conditions[r]);
+    if (missing.length) { alert('Lengkapi semua kondisi terlebih dahulu!'); return; }
+
+    const overall = Object.values(conditions).includes('bad') ? 'bad' : Object.values(conditions).includes('warn') ? 'warn' : 'ok';
+    const waktu = document.getElementById('inspect-waktu').value;
+    const catatan = document.getElementById('inspect-note').value;
+
+    inspeksiLog.push({
+      id: Date.now(),
+      unit: selectedUnit,
+      waktu,
+      conditions: { ...conditions },
+      overall,
+      catatan,
+      tgl: getTodayStr(),
+      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    localStorage.setItem('ps5_inspeksi', JSON.stringify(inspeksiLog));
+
+    // Update unit card status
+    const card = document.getElementById('icard-' + selectedUnit);
+    const dot = card.querySelector('.inspect-status-dot');
+    const text = card.querySelector('.inspect-status-text');
+    dot.className = 'inspect-status-dot ' + overall;
+    text.textContent = overall === 'ok' ? '✓ OK' : overall === 'warn' ? '⚠ Perlu Perhatian' : '✗ Bermasalah';
+    text.style.color = overall === 'ok' ? 'var(--green)' : overall === 'warn' ? 'var(--yellow)' : 'var(--red)';
+
+    document.getElementById('inspect-form').classList.remove('open');
+    selectedUnit = null;
+    conditions = {};
+    alert('✅ Inspeksi ' + selectedUnit + ' tersimpan!');
+    renderLog();
+  }
+
+  function renderLog() {
+    const today = getTodayStr();
+    const todayJadwal = jadwalList.filter(j => j.tgl === today);
+    const todayInspeksi = inspeksiLog.filter(i => i.tgl === today);
+    const masalah = todayInspeksi.filter(i => i.overall !== 'ok');
+
+    document.getElementById('log-antar').textContent = todayJadwal.filter(j => j.jenis === 'antar').length;
+    document.getElementById('log-jemput').textContent = todayJadwal.filter(j => j.jenis === 'jemput').length;
+    document.getElementById('log-inspeksi').textContent = todayInspeksi.length;
+    document.getElementById('log-masalah').textContent = masalah.length;
+
+    const pp = document.getElementById('perlu-perhatian');
+    if (!masalah.length) {
+      pp.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Tidak ada masalah tercatat hari ini. ✓</div>';
+    } else {
+      pp.innerHTML = masalah.map(m => `
+        <div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+          <strong>${m.unit}</strong> — ${m.waktu === 'sebelum' ? 'Sebelum antar' : 'Sesudah kembali'}
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${m.catatan || 'Lihat detail inspeksi'}</div>
+        </div>`).join('');
+    }
+
+    const tbody = document.getElementById('log-tbody');
+    const sorted = [...inspeksiLog].sort((a,b) => b.id - a.id).slice(0,20);
+
+    if (!sorted.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Belum ada log inspeksi.</td></tr>';
+      return;
+    }
+
+    function condBadge(c) {
+      const cls = c === 'ok' ? 'cond-ok' : c === 'warn' ? 'cond-warn' : 'cond-bad';
+      const txt = c === 'ok' ? '✓ OK' : c === 'warn' ? '⚠ Warn' : '✗ Rusak';
+      return `<span class="cond-badge ${cls}">${txt}</span>`;
+    }
+
+    tbody.innerHTML = sorted.map(i => `
+      <tr>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--muted)">${i.tgl}<br>${i.time}</td>
+        <td style="font-weight:700;font-family:var(--mono)">${i.unit}</td>
+        <td style="font-size:12px">${i.waktu === 'sebelum' ? '📦 Sebelum' : '🔙 Sesudah'}</td>
+        <td>${condBadge(i.conditions.konsol)}</td>
+        <td>${condBadge(i.conditions.controller)}</td>
+        <td>${condBadge(i.conditions.monitor)}</td>
+        <td style="font-size:12px;color:var(--muted);max-width:150px">${i.catatan || '—'}</td>
+      </tr>`).join('');
+  }
+
+  function renderSOP() {
+    const grid = document.getElementById('sop-grid');
+    grid.innerHTML = SOPS.map((sop, idx) => `
+      <div class="sop-card" id="sop-${idx}">
+        <div class="sop-header" onclick="toggleSOP(${idx})">
+          <span class="sop-icon">${sop.icon}</span>
+          <span class="sop-title">${sop.title}</span>
+          <span class="sop-toggle">▾</span>
+        </div>
+        <div class="sop-body">
+          ${sop.steps.map((s, i) => `
+            <div class="sop-step">
+              <span class="sop-num">${String(i+1).padStart(2,'0')}</span>
+              <span class="sop-step-text">${s.text}</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function toggleSOP(idx) {
+    const card = document.getElementById('sop-' + idx);
+    card.classList.toggle('open');
+  }
+
+  // INIT
+  const now = new Date();
+  document.getElementById('today-badge').textContent = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  renderHarian();
+  renderSOP();
+</script>
+</body>
+</html>

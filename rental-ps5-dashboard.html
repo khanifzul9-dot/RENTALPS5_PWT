@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Rental PS5 PWK</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --border: #282828;
+    --accent: #00e5ff;
+    --green: #00c853;
+    --yellow: #ffd600;
+    --red: #ff1744;
+    --orange: #ff6d00;
+    --purple: #d500f9;
+    --teal: #1de9b6;
+    --text: #f0f0f0;
+    --muted: #666;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+  }
+
+  .logo-text { color: var(--text); }
+  .logo-text span { color: var(--accent); }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  .clock {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+  }
+
+  .owner-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .owner-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 8px 12px 4px;
+    margin-top: 8px;
+  }
+
+  .sidebar-label:first-child { margin-top: 0; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+    font-weight: 600;
+  }
+
+  .nav-item .nav-icon { font-size: 17px; width: 24px; text-align: center; }
+
+  .nav-item .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar-version {
+    margin-top: auto;
+    padding: 12px;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  /* MAIN CONTENT */
+  .main { overflow-y: auto; }
+
+  .page { display: none; height: 100%; }
+  .page.active { display: block; }
+
+  /* =================== HOME =================== */
+  .home-wrap { padding: 32px 28px; }
+
+  .home-greeting { margin-bottom: 32px; }
+  .home-greeting h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .home-greeting p { color: var(--muted); font-size: 14px; }
+
+  /* KPI ROW */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .kpi-card:hover { border-color: var(--accent); }
+  .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .kpi-card.k1::after { background: var(--accent); }
+  .kpi-card.k2::after { background: var(--green); }
+  .kpi-card.k3::after { background: var(--yellow); }
+  .kpi-card.k4::after { background: var(--orange); }
+
+  .kpi-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+  .kpi-value { font-size: 24px; font-weight: 700; font-family: var(--mono); margin-bottom: 4px; }
+  .kpi-card.k1 .kpi-value { color: var(--accent); }
+  .kpi-card.k2 .kpi-value { color: var(--green); }
+  .kpi-card.k3 .kpi-value { color: var(--yellow); }
+  .kpi-card.k4 .kpi-value { color: var(--orange); }
+  .kpi-sub { font-size: 12px; color: var(--muted); }
+
+  /* MODULE GRID */
+  .module-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .module-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .module-card:hover { transform: translateY(-3px); }
+  .module-card:hover::before { opacity: 1; }
+
+  .module-card.m1 { border-color: rgba(0,229,255,0.3); }
+  .module-card.m1:hover { border-color: var(--accent); box-shadow: 0 8px 32px rgba(0,229,255,0.1); }
+  .module-card.m2 { border-color: rgba(0,200,83,0.3); }
+  .module-card.m2:hover { border-color: var(--green); box-shadow: 0 8px 32px rgba(0,200,83,0.1); }
+  .module-card.m3 { border-color: rgba(213,0,249,0.3); }
+  .module-card.m3:hover { border-color: var(--purple); box-shadow: 0 8px 32px rgba(213,0,249,0.1); }
+  .module-card.m4 { border-color: rgba(255,109,0,0.3); }
+  .module-card.m4:hover { border-color: var(--orange); box-shadow: 0 8px 32px rgba(255,109,0,0.1); }
+  .module-card.m5 { border-color: rgba(29,233,182,0.3); }
+  .module-card.m5:hover { border-color: var(--teal); box-shadow: 0 8px 32px rgba(29,233,182,0.1); }
+
+  .module-header { display: flex; align-items: flex-start; justify-content: space-between; }
+
+  .module-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .module-card.m1 .module-icon { background: rgba(0,229,255,0.1); }
+  .module-card.m2 .module-icon { background: rgba(0,200,83,0.1); }
+  .module-card.m3 .module-icon { background: rgba(213,0,249,0.1); }
+  .module-card.m4 .module-icon { background: rgba(255,109,0,0.1); }
+  .module-card.m5 .module-icon { background: rgba(29,233,182,0.1); }
+
+  .module-arrow { color: var(--muted); font-size: 18px; margin-top: 4px; }
+
+  .module-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .module-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  .module-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .module-tag {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* UNIT STATUS */
+  .unit-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+
+  .unit-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .unit-pill .udot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .unit-pill.av { border-color: var(--green); }
+  .unit-pill.av .udot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .unit-pill.rented { border-color: var(--yellow); }
+  .unit-pill.rented .udot { background: var(--yellow); }
+  .unit-pill.servis { border-color: var(--red); }
+  .unit-pill.servis .udot { background: var(--red); }
+
+  .unit-pill .uname { font-family: var(--mono); font-size: 12px; }
+  .unit-pill .ustatus { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+
+  .quick-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .quick-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+  .quick-btn.primary:hover { opacity: 0.9; color: #000; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+
+  /* IFRAME PAGES */
+  .iframe-wrap { width: 100%; height: calc(100vh - 60px); border: none; display: block; }
+
+  /* BEP MINI */
+  .bep-mini { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 28px; }
+  .bep-mini-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; justify-content: space-between; }
+  .bep-mini-title span { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+  .mini-bep-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .mini-bep-row:last-child { margin-bottom: 0; }
+  .mini-label { font-size: 12px; font-family: var(--mono); color: var(--muted); width: 70px; flex-shrink: 0; }
+  .mini-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .mini-fill { height: 100%; background: var(--green); border-radius: 99px; }
+  .mini-pct { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--green); width: 32px; text-align: right; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .module-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎮</div>
+    <div class="logo-text">Rental <span>PS5</span> PWK</div>
+  </div>
+  <div class="header-right">
+    <div class="clock" id="clock">--:--</div>
+    <div class="owner-chip">
+      <div class="owner-dot"></div>
+      Owner Mode
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Utama</div>
+    <div class="nav-item active" onclick="showPage('home')" id="nav-home">
+      <span class="nav-icon">🏠</span> Dashboard
+    </div>
+
+    <div class="sidebar-label">Modul</div>
+    <div class="nav-item" onclick="showPage('booking')" id="nav-booking">
+      <span class="nav-icon">📋</span> Booking & Deposit
+      <div class="nav-dot" style="background:var(--accent)"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('keuangan')" id="nav-keuangan">
+      <span class="nav-icon">💰</span> Keuangan
+      <div class="nav-dot" style="background:var(--green)"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('gaji')" id="nav-gaji">
+      <span class="nav-icon">👥</span> Gaji Karyawan
+      <div class="nav-dot" style="background:var(--purple)"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('ops')" id="nav-ops">
+      <span class="nav-icon">🚗</span> Operasional
+      <div class="nav-dot" style="background:var(--orange)"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('market')" id="nav-market">
+      <span class="nav-icon">🛒</span> Marketplace
+      <div class="nav-dot" style="background:var(--teal)"></div>
+    </div>
+
+    <div class="sidebar-label">Info</div>
+    <div class="nav-item" onclick="showPage('home')">
+      <span class="nav-icon">📊</span> Ringkasan BEP
+    </div>
+
+    <div class="sidebar-version">
+      🎮 Rental PS5 PWK<br>
+      Sistem v1.0 · 5 Modul<br>
+      <span style="color:var(--accent)">Purwokerto, Jawa Tengah</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-wrap">
+
+        <div class="home-greeting">
+          <h1>Selamat datang 👋</h1>
+          <p id="greeting-date">Dashboard operasional Rental PS5 Purwokerto</p>
+        </div>
+
+        <!-- KPI -->
+        <div class="section-title">Ringkasan Bisnis</div>
+        <div class="kpi-row">
+          <div class="kpi-card k1" onclick="showPage('booking')">
+            <div class="kpi-label">Unit Tersedia</div>
+            <div class="kpi-value">3/5</div>
+            <div class="kpi-sub">2 sedang disewa</div>
+          </div>
+          <div class="kpi-card k2" onclick="showPage('keuangan')">
+            <div class="kpi-label">Estimasi Pendapatan</div>
+            <div class="kpi-value">~13jt</div>
+            <div class="kpi-sub">Target/bulan @ 60% occ.</div>
+          </div>
+          <div class="kpi-card k3" onclick="showPage('keuangan')">
+            <div class="kpi-label">Target BEP</div>
+            <div class="kpi-value">~6 bln</div>
+            <div class="kpi-sub">Modal Rp 65jt · 5 unit</div>
+          </div>
+          <div class="kpi-card k4" onclick="showPage('ops')">
+            <div class="kpi-label">Jadwal Hari Ini</div>
+            <div class="kpi-value" id="kpi-jadwal">0</div>
+            <div class="kpi-sub">Antar + jemput</div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="section-title">Aksi Cepat</div>
+        <div class="quick-actions">
+          <button class="quick-btn primary" onclick="showPage('booking')">📋 Booking Baru</button>
+          <button class="quick-btn" onclick="showPage('ops')">🚗 Tambah Jadwal</button>
+          <button class="quick-btn" onclick="showPage('keuangan')">💰 Catat Transaksi</button>
+          <button class="quick-btn" onclick="showPage('market')">🛒 Pasang Iklan</button>
+        </div>
+
+        <!-- UNIT STATUS -->
+        <div class="section-title">Status Unit</div>
+        <div class="unit-row">
+          <div class="unit-pill av">
+            <div class="udot"></div>
+            <div>
+              <div class="uname">UNIT-01</div>
+              <div class="ustatus">Tersedia</div>
+            </div>
+          </div>
+          <div class="unit-pill av">
+            <div class="udot"></div>
+            <div>
+              <div class="uname">UNIT-02</div>
+              <div class="ustatus">Tersedia</div>
+            </div>
+          </div>
+          <div class="unit-pill av">
+            <div class="udot"></div>
+            <div>
+              <div class="uname">UNIT-03</div>
+              <div class="ustatus">Tersedia</div>
+            </div>
+          </div>
+          <div class="unit-pill rented">
+            <div class="udot"></div>
+            <div>
+              <div class="uname">UNIT-04</div>
+              <div class="ustatus">Disewa</div>
+            </div>
+          </div>
+          <div class="unit-pill servis">
+            <div class="udot"></div>
+            <div>
+              <div class="uname">UNIT-05</div>
+              <div class="ustatus">Servis</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BEP TRACKER MINI -->
+        <div class="bep-mini">
+          <div class="bep-mini-title">
+            Progress BEP per Unit
+            <span>Modal Rp 13jt/unit</span>
+          </div>
+          <div class="mini-bep-row"><div class="mini-label">UNIT-01</div><div class="mini-track"><div class="mini-fill" style="width:0%"></div></div><div class="mini-pct">0%</div></div>
+          <div class="mini-bep-row"><div class="mini-label">UNIT-02</div><div class="mini-track"><div class="mini-fill" style="width:0%"></div></div><div class="mini-pct">0%</div></div>
+          <div class="mini-bep-row"><div class="mini-label">UNIT-03</div><div class="mini-track"><div class="mini-fill" style="width:0%"></div></div><div class="mini-pct">0%</div></div>
+          <div class="mini-bep-row"><div class="mini-label">UNIT-04</div><div class="mini-track"><div class="mini-fill" style="width:0%"></div></div><div class="mini-pct">0%</div></div>
+          <div class="mini-bep-row"><div class="mini-label">UNIT-05</div><div class="mini-track"><div class="mini-fill" style="width:0%"></div></div><div class="mini-pct">0%</div></div>
+        </div>
+
+        <!-- MODULE CARDS -->
+        <div class="section-title">Modul Sistem</div>
+        <div class="module-grid">
+
+          <div class="module-card m1" onclick="showPage('booking')">
+            <div class="module-header">
+              <div class="module-icon">📋</div>
+              <div class="module-arrow">→</div>
+            </div>
+            <div>
+              <div class="module-title">Booking & Deposit</div>
+              <div class="module-desc">Kelola pemesanan unit, upload dokumen penyewa, dan hitung biaya otomatis.</div>
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">Form Booking</span>
+              <span class="module-tag">Upload KTP</span>
+              <span class="module-tag">Kalkulasi Harga</span>
+            </div>
+          </div>
+
+          <div class="module-card m2" onclick="showPage('keuangan')">
+            <div class="module-header">
+              <div class="module-icon">💰</div>
+              <div class="module-arrow">→</div>
+            </div>
+            <div>
+              <div class="module-title">Keuangan & BEP</div>
+              <div class="module-desc">Catat pemasukan & pengeluaran, tracking BEP per unit, laporan bulanan.</div>
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">Transaksi</span>
+              <span class="module-tag">BEP Tracker</span>
+              <span class="module-tag">Laporan</span>
+            </div>
+          </div>
+
+          <div class="module-card m3" onclick="showPage('gaji')">
+            <div class="module-header">
+              <div class="module-icon">👥</div>
+              <div class="module-arrow">→</div>
+            </div>
+            <div>
+              <div class="module-title">Gaji Karyawan</div>
+              <div class="module-desc">Kelola data karyawan, hitung gaji + bonus, cetak slip gaji bulanan.</div>
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">Data Karyawan</span>
+              <span class="module-tag">Slip Gaji</span>
+              <span class="module-tag">Bonus</span>
+            </div>
+          </div>
+
+          <div class="module-card m4" onclick="showPage('ops')">
+            <div class="module-header">
+              <div class="module-icon">🚗</div>
+              <div class="module-arrow">→</div>
+            </div>
+            <div>
+              <div class="module-title">Operasional Harian</div>
+              <div class="module-desc">Jadwal antar jemput, inspeksi kondisi unit, log harian, dan SOP lengkap.</div>
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">Checklist</span>
+              <span class="module-tag">Inspeksi</span>
+              <span class="module-tag">SOP</span>
+            </div>
+          </div>
+
+          <div class="module-card m5" onclick="showPage('market')" style="grid-column: 1/-1">
+            <div class="module-header">
+              <div class="module-icon">🛒</div>
+              <div class="module-arrow">→</div>
+            </div>
+            <div>
+              <div class="module-title">Marketplace</div>
+              <div class="module-desc">Jual beli konsol, controller, dan game fisik. Pasang iklan, hubungi via WA, tandai terjual.</div>
+            </div>
+            <div class="module-tags">
+              <span class="module-tag">Jual Unit</span>
+              <span class="module-tag">Beli Controller</span>
+              <span class="module-tag">Game Fisik</span>
+              <span class="module-tag">Riwayat Transaksi</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- IFRAME PAGES -->
+    <div class="page" id="page-booking">
+      <iframe class="iframe-wrap" src="rental-ps5-booking.html" title="Booking"></iframe>
+    </div>
+    <div class="page" id="page-keuangan">
+      <iframe class="iframe-wrap" src="rental-ps5-keuangan.html" title="Keuangan"></iframe>
+    </div>
+    <div class="page" id="page-gaji">
+      <iframe class="iframe-wrap" src="rental-ps5-gaji.html" title="Gaji"></iframe>
+    </div>
+    <div class="page" id="page-ops">
+      <iframe class="iframe-wrap" src="rental-ps5-operasional.html" title="Operasional"></iframe>
+    </div>
+    <div class="page" id="page-market">
+      <iframe class="iframe-wrap" src="rental-ps5-marketplace.html" title="Marketplace"></iframe>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const PAGES = ['home','booking','keuangan','gaji','ops','market'];
+
+  function showPage(name) {
+    PAGES.forEach(p => {
+      document.getElementById('page-' + p)?.classList.toggle('active', p === name);
+      const nav = document.getElementById('nav-' + p);
+      if (nav) nav.classList.toggle('active', p === name);
+    });
+  }
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = h + ':' + m + ':' + s;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Greeting date
+  const now = new Date();
+  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+  document.getElementById('greeting-date').textContent =
+    days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() +
+    ' · Dashboard operasional Rental PS5 Purwokerto';
+
+  // Jadwal hari ini dari localStorage
+  try {
+    const jadwal = JSON.parse(localStorage.getItem('ps5_jadwal') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    const todayCount = jadwal.filter(j => j.tgl === today).length;
+    document.getElementById('kpi-jadwal').textContent = todayCount;
+  } catch(e) {}
+
+  // BEP dari localStorage
+  try {
+    const trx = JSON.parse(localStorage.getItem('ps5_trx') || '[]');
+    const MODAL = 13000000;
+    const UNITS = ['UNIT-01','UNIT-02','UNIT-03','UNIT-04','UNIT-05'];
+    const rows = document.querySelectorAll('.mini-bep-row');
+    UNITS.forEach((u, i) => {
+      const inc = trx.filter(t => t.unit === u && t.type === 'masuk' && t.kategori === 'sewa').reduce((s,t) => s+t.jumlah, 0);
+      const exp = trx.filter(t => t.unit === u && t.type === 'keluar').reduce((s,t) => s+t.jumlah, 0);
+      const pct = Math.min(100, Math.round((Math.max(0, inc-exp) / MODAL) * 100));
+      if (rows[i]) {
+        rows[i].querySelector('.mini-fill').style.width = pct + '%';
+        rows[i].querySelector('.mini-pct').textContent = pct + '%';
+      }
+    });
+  } catch(e) {}
+</script>
+</body>
+</html>
