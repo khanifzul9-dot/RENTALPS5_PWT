@@ -585,6 +585,279 @@
     .doc-grid { grid-template-columns: 1fr; }
     .doc-checklist { flex-direction: column; }
   }
+
+  /* PAKET SELECTOR */
+  .paket-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+
+  .paket-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    position: relative;
+  }
+
+  .paket-card:hover { border-color: var(--accent); }
+  .paket-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .paket-card.selected-guest { border-color: var(--yellow); background: var(--yellow-dim); }
+
+  .paket-icon { font-size: 22px; margin-bottom: 6px; }
+  .paket-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .paket-price { font-size: 12px; font-family: var(--mono); font-weight: 700; color: var(--accent); }
+  .paket-card.selected-guest .paket-price { color: var(--yellow); }
+  .paket-desc { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  .paket-badge {
+    position: absolute;
+    top: -8px; right: 8px;
+    background: var(--green);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  /* NOTICE BOXES */
+  .notice-box {
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .notice-box.internet { background: rgba(0,229,255,0.07); border: 1px solid var(--accent); color: var(--accent); }
+  .notice-box.guest { background: var(--yellow-dim); border: 1px solid var(--yellow); color: var(--yellow); }
+  .notice-box.psn { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); }
+
+  /* ACKNOWLEDGE CHECKBOXES */
+  .ack-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ack-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .ack-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .ack-item label { cursor: pointer; line-height: 1.5; color: var(--muted); }
+  .ack-item input:checked + label { color: var(--text); }
+
+  /* KONTRAK */
+  .kontrak-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .kontrak-box .k-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-family: var(--font);
+  }
+
+  .kontrak-box .k-row {
+    display: flex;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .kontrak-box .k-row:last-of-type { border-bottom: none; }
+  .kontrak-box .k-label { color: var(--muted); min-width: 140px; }
+  .kontrak-box .k-val { color: var(--text); font-weight: 600; }
+
+  .kontrak-pasal {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--muted);
+    font-family: var(--font);
+  }
+
+  .kontrak-pasal strong { color: var(--text); }
+
+  .kontrak-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-download { flex: 1; padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); color: var(--text); }
+  .btn-download:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* PERPANJANG */
+  .aktif-sewa-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+  .aktif-sewa-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .sewa-unit-badge {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+
+  .sewa-info-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .sewa-info-meta { font-size: 12px; color: var(--muted); }
+  .sewa-countdown { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+  .sewa-countdown.urgent { color: var(--red); }
+  .sewa-countdown.soon { color: var(--yellow); }
+  .sewa-countdown.ok { color: var(--green); }
+
+  .perpanjang-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .perpanjang-form.open { display: block; }
+
+  .extend-btn {
+    padding: 8px 16px;
+    background: var(--yellow-dim);
+    border: 1px solid var(--yellow);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--yellow);
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+
+  .extend-btn:hover { background: var(--yellow); color: #000; }
+
+  /* RATING */
+  .rating-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  .rating-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .rating-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .rating-unit { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .rating-unit-name { font-size: 15px; font-weight: 700; }
+  .rating-avg { text-align: right; }
+  .rating-avg-num { font-size: 24px; font-weight: 800; font-family: var(--mono); color: var(--yellow); }
+  .rating-avg-count { font-size: 11px; color: var(--muted); }
+
+  .stars-display { display: flex; gap: 3px; margin-bottom: 12px; }
+  .star { font-size: 18px; cursor: pointer; transition: transform 0.1s; }
+  .star:hover { transform: scale(1.2); }
+
+  .rating-bars { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .rating-bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .rating-bar-label { width: 12px; color: var(--muted); text-align: right; }
+  .rating-bar-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .rating-bar-fill { height: 100%; background: var(--yellow); border-radius: 99px; }
+  .rating-bar-count { width: 20px; color: var(--muted); font-family: var(--mono); }
+
+  .review-list { display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; }
+  .review-item { background: var(--surface2); border-radius: 8px; padding: 10px 12px; }
+  .review-stars { font-size: 12px; margin-bottom: 3px; }
+  .review-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .review-meta { font-size: 10px; color: var(--border); margin-top: 3px; font-family: var(--mono); }
+
+  .add-review-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .star-picker { display: flex; gap: 8px; margin: 10px 0; }
+  .star-pick { font-size: 28px; cursor: pointer; opacity: 0.3; transition: all 0.15s; }
+  .star-pick.active { opacity: 1; }
+  .star-pick:hover { transform: scale(1.2); }
+
+  .review-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    margin-top: 10px;
+  }
+
+  .review-textarea:focus { border-color: var(--yellow); }
+
+  .submit-review {
+    width: 100%;
+    padding: 11px;
+    background: var(--yellow);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    margin-top: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .aktif-sewa-card { grid-template-columns: 1fr; }
+    .rating-grid { grid-template-columns: 1fr; }
+    .kontrak-actions { flex-direction: column; }
+  }
 </style>
 </head>
 <body>
@@ -607,6 +880,8 @@
     <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
     <button class="tab" onclick="switchTab('booking')">Booking Baru</button>
     <button class="tab" onclick="switchTab('riwayat')">Riwayat</button>
+    <button class="tab" onclick="switchTab('perpanjang')">⏱ Perpanjang</button>
+    <button class="tab" onclick="switchTab('rating')">⭐ Rating</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -679,6 +954,62 @@
 
   <!-- BOOKING BARU -->
   <div class="panel" id="panel-booking">
+
+    <div class="section-title">Pilih Paket</div>
+    <div class="paket-grid">
+      <div class="paket-card" id="paket-harian-full" onclick="selectPaket('harian-full')">
+        <div class="paket-icon">🎮</div>
+        <div class="paket-name">Harian Full</div>
+        <div class="paket-price">Rp 150.000/hari</div>
+        <div class="paket-desc">Akun PSN sendiri<br>Online ✓ Trophy ✓</div>
+      </div>
+      <div class="paket-card" id="paket-harian-guest" onclick="selectPaket('harian-guest')">
+        <div class="paket-icon">👤</div>
+        <div class="paket-name">Harian Guest</div>
+        <div class="paket-price">Rp 100.000/hari</div>
+        <div class="paket-desc">Tanpa akun PSN<br>Offline only ✗</div>
+      </div>
+      <div class="paket-card" id="paket-member-basic" onclick="selectPaket('member-basic')">
+        <div class="paket-icon">🥉</div>
+        <div class="paket-name">Member Basic</div>
+        <div class="paket-price">Rp 700.000/bln</div>
+        <div class="paket-desc">Akun PSN sendiri<br>3 game fisik</div>
+      </div>
+      <div class="paket-card" id="paket-member-plus" onclick="selectPaket('member-plus')">
+        <div class="paket-badge">POPULER</div>
+        <div class="paket-icon">🥈</div>
+        <div class="paket-name">Member Plus</div>
+        <div class="paket-price">Rp 850.000/bln</div>
+        <div class="paket-desc">+ PS Plus Essential<br>3 game fisik</div>
+      </div>
+      <div class="paket-card" id="paket-member-premium" onclick="selectPaket('member-premium')">
+        <div class="paket-icon">🥇</div>
+        <div class="paket-name">Member Premium</div>
+        <div class="paket-price">Rp 1.000.000/bln</div>
+        <div class="paket-desc">+ PS Plus Premium<br>3 game fisik</div>
+      </div>
+      <div class="paket-card" id="paket-member-mifi" onclick="selectPaket('member-mifi')">
+        <div class="paket-icon">📶</div>
+        <div class="paket-name">+ MiFi Add-on</div>
+        <div class="paket-price">+Rp 15.000/hari</div>
+        <div class="paket-desc">Hotspot portable<br>Buat main online</div>
+      </div>
+    </div>
+
+    <!-- NOTICE INTERNET -->
+    <div class="notice-box internet" id="notice-internet" style="display:none">
+      📶 <div><strong>Penting!</strong> Unit <strong>tidak dilengkapi internet</strong>. Untuk bermain online, siapkan hotspot dari HP lo sendiri, atau tambahkan paket MiFi (+Rp 15rb/hari).</div>
+    </div>
+
+    <!-- NOTICE GUEST -->
+    <div class="notice-box guest" id="notice-guest" style="display:none">
+      ⚠️ <div><strong>Mode Guest — Keterbatasan:</strong> Tidak bisa main online multiplayer · Trophy tidak tersimpan · Save data hilang setelah sesi berakhir · Tidak bisa akses PS Store.</div>
+    </div>
+
+    <!-- NOTICE PSN -->
+    <div class="notice-box psn" id="notice-psn" style="display:none">
+      ✅ <div><strong>Akun PSN Kamu Sendiri:</strong> Pastikan login dengan akun PSN milikmu. Jangan lupa <strong>logout setelah selesai</strong> biar data akunmu aman.</div>
+    </div>
 
     <div class="section-title">Data Penyewa</div>
     <div class="form-grid">
@@ -800,8 +1131,57 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="submitBooking()">Konfirmasi Booking</button>
+    <div class="section-title">Pernyataan & Persetujuan</div>
+    <div class="ack-box" id="ack-box">
+      <div class="ack-item">
+        <input type="checkbox" id="ack-internet" onchange="checkAck()">
+        <label for="ack-internet">Saya mengerti bahwa unit <strong>tidak dilengkapi koneksi internet</strong>. Saya wajib menyediakan hotspot/WiFi sendiri jika ingin bermain online.</label>
+      </div>
+      <div class="ack-item" id="ack-guest-item" style="display:none">
+        <input type="checkbox" id="ack-guest" onchange="checkAck()">
+        <label for="ack-guest">Saya memilih mode <strong>Guest (Offline)</strong> dan memahami bahwa tidak bisa main online, trophy tidak tersimpan, dan save data akan hilang setelah sesi berakhir.</label>
+      </div>
+      <div class="ack-item" id="ack-psn-item" style="display:none">
+        <input type="checkbox" id="ack-psn" onchange="checkAck()">
+        <label for="ack-psn">Saya akan login menggunakan <strong>akun PSN saya sendiri</strong> dan berkomitmen untuk logout setelah sesi selesai.</label>
+      </div>
+      <div class="ack-item">
+        <input type="checkbox" id="ack-tnc" onchange="checkAck()">
+        <label for="ack-tnc">Saya menyetujui <strong>syarat & ketentuan</strong> Rivals Play termasuk aturan deposit dan kebijakan denda kerusakan.</label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="submit-btn" onclick="submitBooking()" style="opacity:0.4;cursor:not-allowed" disabled>Konfirmasi Booking</button>
     <div class="success-msg" id="success-msg">✅ Booking berhasil! Silakan transfer dan kirim bukti via WA.</div>
+
+    <div id="kontrak-section" style="display:none;margin-top:20px">
+      <div class="section-title">📄 Kontrak Sewa Digital</div>
+      <div class="kontrak-box">
+        <div class="k-title">PERJANJIAN SEWA UNIT — RIVALS PLAY</div>
+        <div class="k-row"><span class="k-label">ID Booking</span><span class="k-val" id="k-id">—</span></div>
+        <div class="k-row"><span class="k-label">Nama Penyewa</span><span class="k-val" id="k-nama">—</span></div>
+        <div class="k-row"><span class="k-label">No. WhatsApp</span><span class="k-val" id="k-wa">—</span></div>
+        <div class="k-row"><span class="k-label">Unit Disewa</span><span class="k-val" id="k-unit">—</span></div>
+        <div class="k-row"><span class="k-label">Paket</span><span class="k-val" id="k-paket">—</span></div>
+        <div class="k-row"><span class="k-label">Tanggal Mulai</span><span class="k-val" id="k-mulai">—</span></div>
+        <div class="k-row"><span class="k-label">Tanggal Kembali</span><span class="k-val" id="k-selesai">—</span></div>
+        <div class="k-row"><span class="k-label">Total Pembayaran</span><span class="k-val" id="k-total">—</span></div>
+        <div class="k-row"><span class="k-label">Deposit</span><span class="k-val">Rp 200.000 (refundable)</span></div>
+        <div class="kontrak-pasal">
+          <strong>Pasal 1 — Penggunaan Unit:</strong> Penyewa wajib menggunakan unit dengan baik dan bertanggung jawab atas segala kerusakan akibat kelalaian.<br>
+          <strong>Pasal 2 — Internet:</strong> Unit tidak dilengkapi koneksi internet. Penyewa wajib menyediakan hotspot sendiri untuk bermain online.<br>
+          <strong>Pasal 3 — Akun PSN:</strong> Penyewa wajib logout dari akun PSN setelah sewa berakhir. Rivals Play tidak bertanggung jawab atas akun yang tertinggal.<br>
+          <strong>Pasal 4 — Pengembalian:</strong> Unit wajib dikembalikan tepat waktu beserta seluruh kelengkapan. Keterlambatan dikenakan biaya Rp 50.000/hari.<br>
+          <strong>Pasal 5 — Denda:</strong> Kerusakan akibat kelalaian dikenakan denda sesuai kategori yang berlaku di Rivals Play.<br>
+          <strong>Pasal 6 — Deposit:</strong> Deposit dikembalikan maksimal 1x24 jam setelah unit kembali dalam kondisi baik.<br><br>
+          Dengan melakukan booking ini, penyewa dianggap telah membaca, memahami, dan menyetujui seluruh ketentuan di atas.
+        </div>
+      </div>
+      <div class="kontrak-actions">
+        <button class="btn-download" onclick="copyKontrak()">📋 Copy Kontrak</button>
+        <button class="btn-download" onclick="shareKontrakWA()" style="background:var(--green-dim);border-color:var(--green);color:var(--green)">💬 Kirim ke WA Penyewa</button>
+      </div>
+    </div>
 
   </div>
 
@@ -865,6 +1245,92 @@
     </div>
   </div>
 
+  <!-- PERPANJANG -->
+  <div class="panel" id="panel-perpanjang">
+
+    <div class="section-title">Sewa Aktif</div>
+    <div class="aktif-sewa-list" id="aktif-sewa-list">
+      <div style="text-align:center;color:var(--muted);padding:32px;font-size:14px">
+        Belum ada sewa aktif tercatat.
+      </div>
+    </div>
+
+    <div class="perpanjang-form" id="perpanjang-form">
+      <div class="section-title" style="margin-bottom:16px">Form Perpanjangan</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Penyewa</label>
+          <input type="text" id="ext-nama" readonly style="opacity:0.7">
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <input type="text" id="ext-unit" readonly style="opacity:0.7">
+        </div>
+        <div class="form-group">
+          <label>Perpanjang Selama</label>
+          <select id="ext-durasi" onchange="calcExtend()">
+            <option value="1">1 Hari — Rp 150.000</option>
+            <option value="2">2 Hari — Rp 280.000</option>
+            <option value="3">3 Hari — Rp 390.000</option>
+            <option value="7">7 Hari — Rp 850.000</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Kembali Baru</label>
+          <input type="date" id="ext-tgl-baru" readonly style="opacity:0.7">
+        </div>
+        <div class="form-group full">
+          <label>Biaya Perpanjangan</label>
+          <input type="text" id="ext-biaya" readonly style="color:var(--accent);font-weight:700;opacity:0.9">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="cancelExtend()" style="flex:1;padding:11px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Batal</button>
+        <button onclick="confirmExtend()" style="flex:2;padding:11px;background:var(--accent);border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);color:#000">✅ Konfirmasi Perpanjangan</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RATING -->
+  <div class="panel" id="panel-rating">
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+      <div class="section-title" style="margin-bottom:12px">⭐ Tulis Review Unit</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nama / ID Booking</label>
+          <input type="text" id="rev-nama" placeholder="Nama atau ID booking">
+        </div>
+        <div class="form-group">
+          <label>Pilih Unit</label>
+          <select id="rev-unit">
+            <option value="UNIT-01">UNIT-01 — PS5 Slim #1</option>
+            <option value="UNIT-02">UNIT-02 — PS5 Slim #2</option>
+            <option value="UNIT-03">UNIT-03 — PS5 Slim #3</option>
+            <option value="UNIT-04">UNIT-04 — PS5 Slim #4</option>
+            <option value="UNIT-05">UNIT-05 — PS5 Slim #5</option>
+          </select>
+        </div>
+      </div>
+      <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-top:12px;margin-bottom:6px">Rating</label>
+      <div style="display:flex;gap:10px;margin-bottom:12px" id="star-picker">
+        <span style="font-size:28px;cursor:pointer;opacity:0.3;transition:all 0.15s" onclick="setStar(1)" id="sp1">⭐</span>
+        <span style="font-size:28px;cursor:pointer;opacity:0.3;transition:all 0.15s" onclick="setStar(2)" id="sp2">⭐</span>
+        <span style="font-size:28px;cursor:pointer;opacity:0.3;transition:all 0.15s" onclick="setStar(3)" id="sp3">⭐</span>
+        <span style="font-size:28px;cursor:pointer;opacity:0.3;transition:all 0.15s" onclick="setStar(4)" id="sp4">⭐</span>
+        <span style="font-size:28px;cursor:pointer;opacity:0.3;transition:all 0.15s" onclick="setStar(5)" id="sp5">⭐</span>
+      </div>
+      <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Ulasan</label>
+      <textarea id="rev-text" placeholder="Ceritain pengalamanmu — kondisi unit, game, pelayanan..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:vertical;min-height:80px"></textarea>
+      <button onclick="submitReview()" style="width:100%;padding:11px;background:var(--yellow);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:12px">⭐ Kirim Review</button>
+    </div>
+
+    <div class="section-title">Rating per Unit</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px" id="rating-grid"></div>
+
+  </div>
+
 </div>
 
 <!-- MODAL BOOKING CEPAT -->
@@ -897,6 +1363,58 @@
 
 <script>
   const prices = { 1: 150000, 2: 280000, 3: 390000, 7: 850000 };
+  const guestPrices = { 1: 100000, 2: 190000, 3: 270000, 7: 600000 };
+  let currentPaket = 'harian-full';
+  let isGuest = false;
+  let isMember = false;
+
+  function selectPaket(paket) {
+    currentPaket = paket;
+    isGuest = paket === 'harian-guest';
+    isMember = paket.startsWith('member');
+
+    // Update card styles
+    document.querySelectorAll('.paket-card').forEach(c => {
+      c.classList.remove('selected','selected-guest');
+    });
+    const card = document.getElementById('paket-' + paket);
+    if (card) card.classList.add(isGuest ? 'selected-guest' : 'selected');
+
+    // Show/hide notices
+    document.getElementById('notice-internet').style.display = 'flex';
+    document.getElementById('notice-guest').style.display = isGuest ? 'flex' : 'none';
+    document.getElementById('notice-psn').style.display = !isGuest ? 'flex' : 'none';
+
+    // Show/hide ack items
+    document.getElementById('ack-guest-item').style.display = isGuest ? 'flex' : 'none';
+    document.getElementById('ack-psn-item').style.display = !isGuest ? 'flex' : 'none';
+
+    // Show/hide durasi for member (monthly)
+    const durasiGroup = document.getElementById('durasi').closest('.form-group');
+    if (isMember) {
+      document.getElementById('durasi').innerHTML = '<option value="30">1 Bulan</option><option value="60">2 Bulan</option><option value="90">3 Bulan</option>';
+    } else {
+      document.getElementById('durasi').innerHTML = '<option value="1">1 Hari</option><option value="2">2 Hari</option><option value="3">3 Hari</option><option value="7">7 Hari</option>';
+    }
+
+    // Reset ack checkboxes
+    document.getElementById('ack-guest').checked = false;
+    document.getElementById('ack-psn').checked = false;
+    checkAck();
+    calcPrice();
+  }
+
+  function checkAck() {
+    const internet = document.getElementById('ack-internet').checked;
+    const tnc = document.getElementById('ack-tnc').checked;
+    const guest = isGuest ? document.getElementById('ack-guest').checked : true;
+    const psn = !isGuest ? document.getElementById('ack-psn').checked : true;
+    const allChecked = internet && tnc && guest && psn;
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = !allChecked;
+    btn.style.opacity = allChecked ? '1' : '0.4';
+    btn.style.cursor = allChecked ? 'pointer' : 'not-allowed';
+  }
   const ONGKIR = 20000;
   const DEPOSIT = 200000;
   const uploads = { ktp: false, selfie: false, rumah: false };
@@ -911,10 +1429,13 @@
 
   function calcPrice() {
     const durasi = parseInt(document.getElementById('durasi').value);
-    const harga = prices[durasi] || 150000;
+    const priceMap = isGuest ? guestPrices : prices;
+    const memberPriceMap = { 'member-basic': 700000, 'member-plus': 850000, 'member-premium': 1000000 };
+    let harga = isMember ? (memberPriceMap[currentPaket] || 700000) : (priceMap[durasi] || 150000);
     const total = harga + ONGKIR + DEPOSIT;
+    const label = isMember ? (durasi/30) + ' bulan' : durasi + ' hari';
 
-    document.getElementById('info-durasi').textContent = durasi + ' hari';
+    document.getElementById('info-durasi').textContent = label;
     document.getElementById('harga-sewa').textContent = 'Rp ' + harga.toLocaleString('id-ID');
     document.getElementById('total-bayar').textContent = 'Rp ' + total.toLocaleString('id-ID');
 
@@ -1015,6 +1536,7 @@
 _Segera konfirmasi ke penyewa!_`;
 
     document.getElementById('success-msg').style.display = 'block';
+    showKontrak({ bookingId, nama, wa, unit, paket: currentPaket, tglMulai, tglKembali, totalBayar });
 
     // Buka WA owner
     setTimeout(() => {
@@ -1069,6 +1591,263 @@ _Rental PS5 PWK_`;
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('tgl-mulai').value = today;
   calcPrice();
+
+  // =================== KONTRAK ===================
+  let lastBooking = null;
+  const PAKET_LABEL = {
+    'harian-full': 'Harian Full (Akun PSN Sendiri)',
+    'harian-guest': 'Harian Guest (Offline)',
+    'member-basic': 'Member Basic',
+    'member-plus': 'Member Plus (+ PS Plus Essential)',
+    'member-premium': 'Member Premium (+ PS Plus Premium)',
+    'member-mifi': 'Add-on MiFi'
+  };
+
+  function showKontrak(data) {
+    document.getElementById('k-id').textContent = data.bookingId;
+    document.getElementById('k-nama').textContent = data.nama;
+    document.getElementById('k-wa').textContent = data.wa;
+    document.getElementById('k-unit').textContent = data.unit;
+    document.getElementById('k-paket').textContent = PAKET_LABEL[data.paket] || data.paket;
+    document.getElementById('k-mulai').textContent = data.tglMulai;
+    document.getElementById('k-selesai').textContent = data.tglKembali;
+    document.getElementById('k-total').textContent = data.totalBayar;
+    document.getElementById('kontrak-section').style.display = 'block';
+    lastBooking = data;
+
+    // Save to active bookings
+    let activeBookings = JSON.parse(localStorage.getItem('rp_active_bookings') || '[]');
+    activeBookings.push({ ...data, status: 'aktif', ts: Date.now() });
+    localStorage.setItem('rp_active_bookings', JSON.stringify(activeBookings));
+  }
+
+  function copyKontrak() {
+    if (!lastBooking) return;
+    const text = `PERJANJIAN SEWA — RIVALS PLAY
+ID: ${lastBooking.bookingId}
+Nama: ${lastBooking.nama}
+WA: ${lastBooking.wa}
+Unit: ${lastBooking.unit}
+Paket: ${PAKET_LABEL[lastBooking.paket] || lastBooking.paket}
+Mulai: ${lastBooking.tglMulai}
+Kembali: ${lastBooking.tglKembali}
+Total: ${lastBooking.totalBayar}
+Deposit: Rp 200.000 (refundable)
+
+Syarat: Unit tidak dilengkapi internet. Wajib logout PSN setelah selesai. Keterlambatan +Rp 50rb/hari. Kerusakan dikenakan denda sesuai kategori.`;
+    navigator.clipboard.writeText(text).then(() => alert('✅ Kontrak berhasil dicopy!')).catch(() => alert('Gagal copy, coba manual.'));
+  }
+
+  function shareKontrakWA() {
+    if (!lastBooking) return;
+    const text = `📄 *KONTRAK SEWA — RIVALS PLAY*
+━━━━━━━━━━━━━━━━
+📋 ID: ${lastBooking.bookingId}
+👤 Nama: ${lastBooking.nama}
+🎮 Unit: ${lastBooking.unit}
+📦 Paket: ${PAKET_LABEL[lastBooking.paket] || lastBooking.paket}
+📅 ${lastBooking.tglMulai} → ${lastBooking.tglKembali}
+💰 Total: ${lastBooking.totalBayar}
+🔒 Deposit: Rp 200.000 (refundable)
+━━━━━━━━━━━━━━━━
+⚠️ *Catatan Penting:*
+• Unit tidak ada internet — siapkan hotspot sendiri
+• Wajib logout akun PSN setelah selesai
+• Keterlambatan +Rp 50.000/hari
+• Kerusakan dikenakan denda sesuai kategori
+
+Simpan pesan ini sebagai bukti perjanjian sewa. Terima kasih! 🎮
+_Rivals Play Purwokerto_`;
+    const num = lastBooking.wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(text), '_blank');
+  }
+
+  // =================== PERPANJANG ===================
+  let extBookingId = null;
+
+  function renderAktifSewa() {
+    const list = document.getElementById('aktif-sewa-list');
+    const bookings = JSON.parse(localStorage.getItem('rp_active_bookings') || '[]')
+      .filter(b => b.status === 'aktif');
+
+    if (!bookings.length) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:32px;font-size:14px">Belum ada sewa aktif tercatat.</div>';
+      return;
+    }
+
+    list.innerHTML = bookings.map(b => {
+      const today = new Date();
+      const kembali = new Date(b.tglKembali);
+      const diff = Math.ceil((kembali - today) / (1000 * 60 * 60 * 24));
+      const countdownClass = diff <= 0 ? 'urgent' : diff <= 1 ? 'soon' : 'ok';
+      const countdownText = diff <= 0 ? 'TERLAMBAT ' + Math.abs(diff) + ' hari' : diff === 0 ? 'Kembali HARI INI' : 'Sisa ' + diff + ' hari';
+
+      return `
+        <div class="aktif-sewa-card">
+          <div class="sewa-unit-badge">${b.unit}</div>
+          <div>
+            <div class="sewa-info-name">${b.nama}</div>
+            <div class="sewa-info-meta">${PAKET_LABEL[b.paket] || b.paket} · ${b.tglMulai} → ${b.tglKembali}</div>
+            <div class="sewa-info-meta">📱 ${b.wa}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="sewa-countdown ${countdownClass}">${countdownText}</div>
+            <button class="extend-btn" style="margin-top:8px" onclick="openExtend('${b.bookingId}')">⏱ Perpanjang</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function openExtend(bookingId) {
+    extBookingId = bookingId;
+    const bookings = JSON.parse(localStorage.getItem('rp_active_bookings') || '[]');
+    const b = bookings.find(x => x.bookingId === bookingId);
+    if (!b) return;
+
+    document.getElementById('ext-nama').value = b.nama;
+    document.getElementById('ext-unit').value = b.unit;
+    calcExtend(b.tglKembali);
+    document.getElementById('perpanjang-form').classList.add('open');
+    document.getElementById('perpanjang-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function calcExtend(baseTgl) {
+    const bookings = JSON.parse(localStorage.getItem('rp_active_bookings') || '[]');
+    const b = bookings.find(x => x.bookingId === extBookingId);
+    const tgl = baseTgl || (b ? b.tglKembali : new Date().toISOString().split('T')[0]);
+    const durasi = parseInt(document.getElementById('ext-durasi').value) || 1;
+    const extPrices = { 1: 150000, 2: 280000, 3: 390000, 7: 850000 };
+    const biaya = extPrices[durasi] || 150000;
+
+    const d = new Date(tgl);
+    d.setDate(d.getDate() + durasi);
+    document.getElementById('ext-tgl-baru').value = d.toISOString().split('T')[0];
+    document.getElementById('ext-biaya').value = 'Rp ' + biaya.toLocaleString('id-ID');
+  }
+
+  function cancelExtend() {
+    extBookingId = null;
+    document.getElementById('perpanjang-form').classList.remove('open');
+  }
+
+  function confirmExtend() {
+    if (!extBookingId) return;
+    const bookings = JSON.parse(localStorage.getItem('rp_active_bookings') || '[]');
+    const b = bookings.find(x => x.bookingId === extBookingId);
+    if (!b) return;
+
+    const tglBaru = document.getElementById('ext-tgl-baru').value;
+    const biaya = document.getElementById('ext-biaya').value;
+    b.tglKembali = tglBaru;
+
+    localStorage.setItem('rp_active_bookings', JSON.stringify(bookings));
+
+    // WA notification
+    const msg = `⏱ *PERPANJANGAN SEWA — RIVALS PLAY*
+━━━━━━━━━━━━━━━━
+📋 ID: ${b.bookingId}
+👤 ${b.nama} · ${b.unit}
+📅 Tanggal kembali baru: *${tglBaru}*
+💰 Biaya perpanjangan: *${biaya}*
+━━━━━━━━━━━━━━━━
+Mohon transfer biaya perpanjangan secepatnya. Terima kasih! 🎮
+_Rivals Play_`;
+
+    const num = b.wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg), '_blank');
+
+    cancelExtend();
+    renderAktifSewa();
+    alert('✅ Perpanjangan dikonfirmasi! Notifikasi dikirim ke WA penyewa.');
+  }
+
+  // =================== RATING ===================
+  let selectedStar = 0;
+  let reviews = JSON.parse(localStorage.getItem('rp_reviews') || '[]');
+  const UNITS = ['UNIT-01','UNIT-02','UNIT-03','UNIT-04','UNIT-05'];
+
+  function setStar(n) {
+    selectedStar = n;
+    document.querySelectorAll('.star-pick').forEach((s, i) => {
+      s.classList.toggle('active', i < n);
+    });
+  }
+
+  function submitReview() {
+    const nama = document.getElementById('rev-nama').value.trim();
+    const unit = document.getElementById('rev-unit').value;
+    const text = document.getElementById('rev-text').value.trim();
+    if (!nama) { alert('Nama wajib diisi!'); return; }
+    if (!selectedStar) { alert('Pilih rating bintang dulu!'); return; }
+
+    reviews.push({
+      id: Date.now(),
+      nama, unit, star: selectedStar, text,
+      tgl: new Date().toLocaleDateString('id-ID')
+    });
+
+    localStorage.setItem('rp_reviews', JSON.stringify(reviews));
+    document.getElementById('rev-nama').value = '';
+    document.getElementById('rev-text').value = '';
+    selectedStar = 0;
+    setStar(0);
+    renderRatings();
+    alert('✅ Review berhasil dikirim! Terima kasih 🌟');
+  }
+
+  function renderRatings() {
+    const grid = document.getElementById('rating-grid');
+    grid.innerHTML = UNITS.map(unit => {
+      const unitReviews = reviews.filter(r => r.unit === unit);
+      const avg = unitReviews.length ? (unitReviews.reduce((s,r) => s + r.star, 0) / unitReviews.length).toFixed(1) : '—';
+      const stars = avg !== '—' ? '⭐'.repeat(Math.round(parseFloat(avg))) : '';
+
+      // Count per star
+      const counts = [5,4,3,2,1].map(s => ({
+        star: s,
+        count: unitReviews.filter(r => r.star === s).length,
+        pct: unitReviews.length ? Math.round((unitReviews.filter(r => r.star === s).length / unitReviews.length) * 100) : 0
+      }));
+
+      const recentReviews = [...unitReviews].sort((a,b) => b.id - a.id).slice(0,3);
+
+      return `
+        <div class="rating-card">
+          <div class="rating-card-header">
+            <div>
+              <div class="rating-unit">${unit}</div>
+              <div class="rating-unit-name">PS5 Slim #${unit.slice(-1)}</div>
+            </div>
+            <div class="rating-avg">
+              <div class="rating-avg-num">${avg}</div>
+              <div class="rating-avg-count">${unitReviews.length} review</div>
+            </div>
+          </div>
+          <div class="stars-display">${stars || '<span style="color:var(--muted);font-size:13px">Belum ada rating</span>'}</div>
+          <div class="rating-bars">
+            ${counts.map(c => `
+              <div class="rating-bar-row">
+                <div class="rating-bar-label">${c.star}</div>
+                <div class="rating-bar-track"><div class="rating-bar-fill" style="width:${c.pct}%"></div></div>
+                <div class="rating-bar-count">${c.count}</div>
+              </div>`).join('')}
+          </div>
+          <div class="review-list">
+            ${recentReviews.length ? recentReviews.map(r => `
+              <div class="review-item">
+                <div class="review-stars">${'⭐'.repeat(r.star)}</div>
+                <div class="review-text">${r.text || '(Tidak ada komentar)'}</div>
+                <div class="review-meta">${r.nama} · ${r.tgl}</div>
+              </div>`).join('') : '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Belum ada review</div>'}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+
+
 </script>
 </body>
 </html>
