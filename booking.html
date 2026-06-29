@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking — Rivals Play Purwokerto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --border: #282828;
+    --accent: #00e5ff;
+    --accent-dim: rgba(0,229,255,0.1);
+    --green: #00c853;
+    --green-dim: rgba(0,200,83,0.1);
+    --yellow: #ffd600;
+    --yellow-dim: rgba(255,214,0,0.1);
+    --red: #ff1744;
+    --red-dim: rgba(255,23,68,0.08);
+    --text: #f0f0f0;
+    --muted: #666;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0a0a0a, #1a0030);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 24px 24px;
+    text-align: center;
+  }
+
+  .hero-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; }
+  .hero-logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #00b8d4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .hero-logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .hero-logo-text span { color: var(--accent); }
+
+  .hero-tagline { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .hero-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .hero-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .hero-pill.green { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+  .hero-pill.accent { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  .container { max-width: 540px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* STEP INDICATOR */
+  .steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 2px solid var(--border); color: var(--muted); background: var(--surface2); transition: all 0.2s; }
+  .step.active .step-num { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .step.done .step-num { border-color: var(--green); color: #000; background: var(--green); }
+  .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; }
+  .step.active .step-label { color: var(--accent); }
+  .step.done .step-label { color: var(--green); }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin-bottom: 16px; }
+  .step-line.done { background: var(--green); }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-title .num { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #000; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+  /* PAKET */
+  .paket-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .paket-item {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .paket-item:hover { border-color: var(--accent); }
+  .paket-item.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .paket-item.selected-guest { border-color: var(--yellow); background: var(--yellow-dim); }
+
+  .paket-item-icon { font-size: 24px; flex-shrink: 0; }
+  .paket-item-info { flex: 1; }
+  .paket-item-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .paket-item-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .paket-item-price { font-size: 14px; font-weight: 800; font-family: var(--mono); color: var(--accent); flex-shrink: 0; }
+  .paket-item.selected-guest .paket-item-price { color: var(--yellow); }
+
+  .paket-badge {
+    position: absolute;
+    top: -8px; right: 12px;
+    background: var(--green);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  /* NOTICE */
+  .notice {
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .notice.info { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); }
+  .notice.warn { background: var(--yellow-dim); border: 1px solid var(--yellow); color: var(--yellow); }
+  .notice.success { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); }
+  .notice.danger { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
+
+  /* FORM */
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; transition: border-color 0.15s; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* DOC UPLOAD */
+  .doc-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+
+  .doc-card {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .doc-card.uploaded { border-style: solid; border-color: var(--green); background: var(--green-dim); }
+  .doc-card input[type="file"] { display: none; }
+  .doc-card label { cursor: pointer; display: block; }
+  .doc-icon { font-size: 22px; margin-bottom: 6px; }
+  .doc-name { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .doc-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
+  .doc-status { font-size: 10px; color: var(--green); margin-top: 5px; font-weight: 700; min-height: 14px; }
+  .doc-preview img { width: 100%; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 6px; }
+
+  /* ACK */
+  .ack-list { display: flex; flex-direction: column; gap: 10px; }
+  .ack-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; cursor: pointer; }
+  .ack-item input[type="checkbox"] { width: 18px; height: 18px; margin-top: 1px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+  .ack-item label { color: var(--muted); cursor: pointer; }
+  .ack-item input:checked + label { color: var(--text); }
+
+  /* PRICE BOX */
+  .price-box { background: var(--surface2); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .price-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .price-row:last-child { border-bottom: none; font-size: 16px; font-weight: 700; }
+  .price-row:last-child span:last-child { color: var(--accent); font-family: var(--mono); }
+  .price-row span:last-child { font-family: var(--mono); font-weight: 600; }
+
+  /* SUBMIT */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #00b8d4);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; background: var(--surface2); color: var(--muted); }
+
+  /* SUCCESS */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .success-screen.show { display: block; }
+
+  .success-icon { font-size: 64px; margin-bottom: 16px; }
+  .success-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+  .kontrak-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: left;
+    margin-bottom: 16px;
+    font-size: 12px;
+  }
+
+  .kontrak-title { font-size: 13px; font-weight: 800; text-align: center; margin-bottom: 14px; color: var(--accent); }
+  .kontrak-row { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+  .kontrak-row:last-of-type { border-bottom: none; }
+  .kontrak-label { color: var(--muted); min-width: 110px; flex-shrink: 0; }
+  .kontrak-val { font-weight: 600; }
+  .kontrak-pasal { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); line-height: 1.8; }
+  .kontrak-pasal strong { color: var(--text); }
+
+  .action-btns { display: flex; flex-direction: column; gap: 10px; }
+  .action-btn { width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: 1px solid var(--border); background: var(--surface2); color: var(--text); transition: all 0.15s; }
+  .action-btn.primary { background: var(--green); color: #000; border-color: var(--green); }
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .action-btn.primary:hover { opacity: 0.9; color: #000; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 20px; }
+
+  @media (max-width: 400px) {
+    .doc-grid { grid-template-columns: 1fr; }
+    .paket-item { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">
+    <div class="hero-logo-icon">🎮</div>
+    <div class="hero-logo-text">Rivals <span>Play</span></div>
+  </div>
+  <div class="hero-tagline">Rental PS5 Purwokerto · Antar Jemput</div>
+  <div class="hero-pills">
+    <div class="hero-pill green">✓ Unit Lengkap</div>
+    <div class="hero-pill accent">✓ Include Monitor</div>
+    <div class="hero-pill">✓ 3 Game Fisik</div>
+    <div class="hero-pill">✓ 2 Controller</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" style="margin-bottom:28px">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">Paket</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">Data</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-label">Dokumen</div>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step" id="step4">
+      <div class="step-num">4</div>
+      <div class="step-label">Konfirmasi</div>
+    </div>
+  </div>
+
+  <!-- FORM SECTION -->
+  <div id="form-section">
+
+    <!-- STEP 1: PAKET -->
+    <div id="step-1">
+      <div class="card">
+        <div class="card-title"><div class="num">1</div> Pilih Paket</div>
+        <div class="paket-list">
+
+          <div class="paket-item selected" id="p-harian-full" onclick="selectPaket('harian-full')">
+            <div class="paket-item-icon">🎮</div>
+            <div class="paket-item-info">
+              <div class="paket-item-name">Harian Full</div>
+              <div class="paket-item-desc">Akun PSN sendiri · Online ✓ · Trophy ✓ · Save data aman</div>
+            </div>
+            <div class="paket-item-price">Rp 150rb/hari</div>
+          </div>
+
+          <div class="paket-item" id="p-harian-guest" onclick="selectPaket('harian-guest')">
+            <div class="paket-item-icon">👤</div>
+            <div class="paket-item-info">
+              <div class="paket-item-name">Harian Guest</div>
+              <div class="paket-item-desc">Tanpa akun PSN · Offline only · Lebih hemat</div>
+            </div>
+            <div class="paket-item-price" style="color:var(--yellow)">Rp 100rb/hari</div>
+          </div>
+
+          <div class="paket-item" id="p-member-basic" onclick="selectPaket('member-basic')">
+            <div class="paket-item-icon">🥉</div>
+            <div class="paket-item-info">
+              <div class="paket-item-name">Member Basic</div>
+              <div class="paket-item-desc">Bulanan · Akun PSN sendiri · 3 slot game · 2x tukar/bln</div>
+            </div>
+            <div class="paket-item-price">Rp 700rb/bln</div>
+          </div>
+
+          <div class="paket-item" id="p-member-plus" onclick="selectPaket('member-plus')">
+            <div class="paket-badge">POPULER</div>
+            <div class="paket-item-icon">🥈</div>
+            <div class="paket-item-info">
+              <div class="paket-item-name">Member Plus</div>
+              <div class="paket-item-desc">Bulanan · + PS Plus Essential · 4 slot game · 3x tukar/bln</div>
+            </div>
+            <div class="paket-item-price">Rp 850rb/bln</div>
+          </div>
+
+          <div class="paket-item" id="p-member-premium" onclick="selectPaket('member-premium')">
+            <div class="paket-item-icon">🥇</div>
+            <div class="paket-item-info">
+              <div class="paket-item-name">Member Premium</div>
+              <div class="paket-item-desc">Bulanan · + PS Plus Premium · 5 slot game · 4x tukar/bln · Early access</div>
+            </div>
+            <div class="paket-item-price">Rp 1jt/bln</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="num" style="background:var(--yellow);color:#000">!</div> Durasi Sewa</div>
+        <div class="form-group">
+          <label>Durasi</label>
+          <select id="durasi" onchange="calcHarga()">
+            <option value="1">1 Hari</option>
+            <option value="2">2 Hari</option>
+            <option value="3">3 Hari</option>
+            <option value="7">7 Hari</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Mulai</label>
+          <input type="date" id="tgl-mulai" onchange="calcHarga()">
+        </div>
+        <div class="form-group">
+          <label>Tanggal Kembali</label>
+          <input type="date" id="tgl-kembali" readonly style="opacity:0.6">
+        </div>
+      </div>
+
+      <!-- NOTICES -->
+      <div class="notice info" id="n-internet">
+        📶 <div><strong>Tidak ada WiFi di unit.</strong> Siapkan hotspot HP kamu sendiri untuk main online. Atau tambah MiFi +Rp 15rb/hari saat checkout.</div>
+      </div>
+      <div class="notice warn" id="n-guest" style="display:none">
+        ⚠️ <div><strong>Mode Guest:</strong> Tidak bisa main online · Trophy tidak tersimpan · Save data hilang setelah selesai · Tidak bisa akses PS Store.</div>
+      </div>
+      <div class="notice success" id="n-psn" style="display:none">
+        ✅ <div><strong>Pakai akun PSN kamu sendiri.</strong> Progress game, trophy, dan save data tersimpan di akunmu. Jangan lupa logout setelah selesai!</div>
+      </div>
+
+      <button class="submit-btn" onclick="goStep(2)">Lanjut →</button>
+    </div>
+
+    <!-- STEP 2: DATA -->
+    <div id="step-2" style="display:none">
+      <div class="card">
+        <div class="card-title"><div class="num">2</div> Data Diri</div>
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="nama" placeholder="Nama sesuai KTP">
+        </div>
+        <div class="form-group">
+          <label>No. WhatsApp Aktif</label>
+          <input type="text" id="wa" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>Pilih Unit</label>
+          <select id="unit">
+            <option value="">— Pilih Unit —</option>
+            <option value="UNIT-01">UNIT-01 — PS5 Slim #1</option>
+            <option value="UNIT-02">UNIT-02 — PS5 Slim #2</option>
+            <option value="UNIT-03">UNIT-03 — PS5 Slim #3</option>
+            <option value="UNIT-04">UNIT-04 — PS5 Slim #4</option>
+            <option value="UNIT-05">UNIT-05 — PS5 Slim #5</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Alamat Lengkap</label>
+          <textarea id="alamat" placeholder="Jl. nama jalan, RT/RW, Kelurahan, Kecamatan, Purwokerto"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Kontak Darurat (Nama & WA)</label>
+          <input type="text" id="kontak" placeholder="Contoh: Budi (Kakak) — 08123456789">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="submit-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);flex:1" onclick="goStep(1)">← Kembali</button>
+        <button class="submit-btn" style="flex:2" onclick="goStep(3)">Lanjut →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: DOKUMEN -->
+    <div id="step-3" style="display:none">
+      <div class="card">
+        <div class="card-title"><div class="num">3</div> Dokumen Jaminan</div>
+        <div class="notice info" style="margin-bottom:14px">
+          🔒 <div>Data kamu aman dan hanya digunakan sebagai jaminan sewa. Tidak disebarkan ke pihak ketiga.</div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-card" id="dc-ktp">
+            <label for="up-ktp">
+              <div class="doc-icon">🪪</div>
+              <div class="doc-name">Foto KTP</div>
+              <div class="doc-desc">KTP asli, jelas tidak buram</div>
+            </label>
+            <input type="file" id="up-ktp" accept="image/*" onchange="handleDoc('ktp',this)">
+            <div class="doc-preview" id="prev-ktp"></div>
+            <div class="doc-status" id="stat-ktp"></div>
+          </div>
+          <div class="doc-card" id="dc-selfie">
+            <label for="up-selfie">
+              <div class="doc-icon">🤳</div>
+              <div class="doc-name">Selfie + KTP</div>
+              <div class="doc-desc">Wajah & KTP terlihat jelas</div>
+            </label>
+            <input type="file" id="up-selfie" accept="image/*" onchange="handleDoc('selfie',this)">
+            <div class="doc-preview" id="prev-selfie"></div>
+            <div class="doc-status" id="stat-selfie"></div>
+          </div>
+          <div class="doc-card" id="dc-rumah">
+            <label for="up-rumah">
+              <div class="doc-icon">🏠</div>
+              <div class="doc-name">Foto Rumah</div>
+              <div class="doc-desc">Tampak depan rumah/kos</div>
+            </label>
+            <input type="file" id="up-rumah" accept="image/*" onchange="handleDoc('rumah',this)">
+            <div class="doc-preview" id="prev-rumah"></div>
+            <div class="doc-status" id="stat-rumah"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="doc-checklist">
+          <div style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--muted)" id="ck-ktp">○ KTP</div>
+          <div style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--muted)" id="ck-selfie">○ Selfie</div>
+          <div style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--muted)" id="ck-rumah">○ Rumah</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="submit-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);flex:1" onclick="goStep(2)">← Kembali</button>
+        <button class="submit-btn" style="flex:2" id="btn-step4" onclick="goStep(4)" disabled>Lanjut →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: KONFIRMASI -->
+    <div id="step-4" style="display:none">
+      <div class="card">
+        <div class="card-title"><div class="num">4</div> Ringkasan Booking</div>
+        <div class="price-box">
+          <div class="price-row"><span>Paket</span><span id="sum-paket">—</span></div>
+          <div class="price-row"><span>Unit</span><span id="sum-unit">—</span></div>
+          <div class="price-row"><span>Durasi</span><span id="sum-durasi">—</span></div>
+          <div class="price-row"><span>Tanggal</span><span id="sum-tgl">—</span></div>
+          <div class="price-row"><span>Harga Sewa</span><span id="sum-harga">—</span></div>
+          <div class="price-row"><span>Ongkir Antar Jemput</span><span>Rp 20.000</span></div>
+          <div class="price-row"><span>Deposit (refundable)</span><span>Rp 200.000</span></div>
+          <div class="price-row"><span>Total Bayar</span><span id="sum-total">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="num" style="background:var(--yellow);color:#000">!</div> Persetujuan</div>
+        <div class="ack-list">
+          <div class="ack-item">
+            <input type="checkbox" id="ack-internet" onchange="checkAllAck()">
+            <label for="ack-internet">Saya mengerti unit <strong>tidak dilengkapi internet</strong>. Saya siapkan hotspot sendiri untuk main online.</label>
+          </div>
+          <div class="ack-item" id="ack-guest-wrap" style="display:none">
+            <input type="checkbox" id="ack-guest" onchange="checkAllAck()">
+            <label for="ack-guest">Saya memilih mode <strong>Guest (Offline)</strong> dan memahami keterbatasannya: tidak bisa online, trophy & save data tidak tersimpan.</label>
+          </div>
+          <div class="ack-item" id="ack-psn-wrap" style="display:none">
+            <input type="checkbox" id="ack-psn" onchange="checkAllAck()">
+            <label for="ack-psn">Saya akan login dengan <strong>akun PSN saya sendiri</strong> dan berkomitmen logout setelah sesi selesai.</label>
+          </div>
+          <div class="ack-item">
+            <input type="checkbox" id="ack-tnc" onchange="checkAllAck()">
+            <label for="ack-tnc">Saya setuju dengan <strong>syarat & ketentuan</strong> Rivals Play termasuk kebijakan deposit dan denda kerusakan.</label>
+          </div>
+          <div class="ack-item">
+            <input type="checkbox" id="ack-telat" onchange="checkAllAck()">
+            <label for="ack-telat">Saya mengerti keterlambatan pengembalian dikenakan biaya <strong>Rp 50.000/hari</strong>.</label>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="submit-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);flex:1" onclick="goStep(3)">← Kembali</button>
+        <button class="submit-btn" style="flex:2" id="btn-submit" onclick="submitBooking()" disabled>🎮 Booking Sekarang</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Booking Berhasil!</div>
+    <div class="success-sub">Booking kamu sudah kami terima.<br>Cek WA kamu untuk konfirmasi & instruksi pembayaran.</div>
+
+    <div class="kontrak-box">
+      <div class="kontrak-title">📄 BUKTI BOOKING — RIVALS PLAY</div>
+      <div class="kontrak-row"><span class="kontrak-label">ID Booking</span><span class="kontrak-val" id="k-id">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Nama</span><span class="kontrak-val" id="k-nama">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Unit</span><span class="kontrak-val" id="k-unit">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Paket</span><span class="kontrak-val" id="k-paket">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Tanggal</span><span class="kontrak-val" id="k-tgl">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Total Bayar</span><span class="kontrak-val" id="k-total">—</span></div>
+      <div class="kontrak-row"><span class="kontrak-label">Deposit</span><span class="kontrak-val">Rp 200.000 (refundable)</span></div>
+      <div class="kontrak-pasal">
+        <strong>Catatan:</strong> Unit tidak dilengkapi internet. Wajib logout PSN setelah selesai. Keterlambatan +Rp 50rb/hari. Simpan bukti ini sebagai referensi.
+      </div>
+    </div>
+
+    <div class="action-btns">
+      <button class="action-btn primary" onclick="shareWA()">💬 Buka WA untuk Konfirmasi</button>
+      <button class="action-btn" onclick="copyBukti()">📋 Copy Bukti Booking</button>
+      <button class="action-btn" onclick="bookingLagi()">🔄 Booking Lagi</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  🎮 Rivals Play Purwokerto · Booking & Info: WA kami<br>
+  Unit lengkap · Antar jemput · Purwokerto & sekitarnya
+</div>
+
+<script>
+  // ⚠️ GANTI NOMOR WA OWNER
+  const OWNER_WA = '6281234567890';
+
+  const PAKET_LABEL = {
+    'harian-full': 'Harian Full',
+    'harian-guest': 'Harian Guest (Offline)',
+    'member-basic': 'Member Basic',
+    'member-plus': 'Member Plus (+ PS Plus Essential)',
+    'member-premium': 'Member Premium (+ PS Plus Premium)'
+  };
+
+  const HARIAN_PRICES = { 1:150000, 2:280000, 3:390000, 7:850000 };
+  const GUEST_PRICES = { 1:100000, 2:190000, 3:270000, 7:600000 };
+  const MEMBER_PRICES = { 'member-basic':700000, 'member-plus':850000, 'member-premium':1000000 };
+  const ONGKIR = 20000;
+  const DEPOSIT = 200000;
+
+  let currentPaket = 'harian-full';
+  let isGuest = false;
+  let isMember = false;
+  let uploads = { ktp: false, selfie: false, rumah: false };
+  let currentStep = 1;
+  let lastBookingData = null;
+
+  function selectPaket(paket) {
+    currentPaket = paket;
+    isGuest = paket === 'harian-guest';
+    isMember = paket.startsWith('member');
+
+    document.querySelectorAll('.paket-item').forEach(el => {
+      el.classList.remove('selected', 'selected-guest');
+    });
+    const el = document.getElementById('p-' + paket);
+    if (el) el.classList.add(isGuest ? 'selected-guest' : 'selected');
+
+    // Update notices
+    document.getElementById('n-guest').style.display = isGuest ? 'flex' : 'none';
+    document.getElementById('n-psn').style.display = !isGuest ? 'flex' : 'none';
+
+    // Update durasi options
+    const dur = document.getElementById('durasi');
+    if (isMember) {
+      dur.innerHTML = '<option value="30">1 Bulan</option><option value="60">2 Bulan</option><option value="90">3 Bulan</option>';
+    } else {
+      dur.innerHTML = '<option value="1">1 Hari</option><option value="2">2 Hari</option><option value="3">3 Hari</option><option value="7">7 Hari</option>';
+    }
+
+    // Ack boxes
+    document.getElementById('ack-guest-wrap').style.display = isGuest ? 'flex' : 'none';
+    document.getElementById('ack-psn-wrap').style.display = !isGuest ? 'flex' : 'none';
+
+    calcHarga();
+  }
+
+  function calcHarga() {
+    const durasi = parseInt(document.getElementById('durasi').value) || 1;
+    let harga = isMember ? (MEMBER_PRICES[currentPaket] || 700000) :
+                isGuest ? (GUEST_PRICES[durasi] || 100000) :
+                (HARIAN_PRICES[durasi] || 150000);
+
+    const total = harga + ONGKIR + DEPOSIT;
+    const label = isMember ? (durasi/30) + ' bulan' : durasi + ' hari';
+
+    // Update tgl kembali
+    const mulai = document.getElementById('tgl-mulai').value;
+    if (mulai) {
+      const d = new Date(mulai);
+      d.setDate(d.getDate() + durasi);
+      document.getElementById('tgl-kembali').value = d.toISOString().split('T')[0];
+    }
+
+    // Update summary
+    document.getElementById('sum-paket').textContent = PAKET_LABEL[currentPaket] || currentPaket;
+    document.getElementById('sum-unit').textContent = document.getElementById('unit')?.value || '—';
+    document.getElementById('sum-durasi').textContent = label;
+    document.getElementById('sum-tgl').textContent = mulai ? mulai + ' → ' + document.getElementById('tgl-kembali').value : '—';
+    document.getElementById('sum-harga').textContent = 'Rp ' + harga.toLocaleString('id-ID');
+    document.getElementById('sum-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+    return { harga, total, label, durasi };
+  }
+
+  function goStep(n) {
+    // Validate before moving forward
+    if (n === 2 && currentStep === 1) {
+      const mulai = document.getElementById('tgl-mulai').value;
+      if (!mulai) { alert('Pilih tanggal mulai dulu!'); return; }
+    }
+    if (n === 3 && currentStep === 2) {
+      const nama = document.getElementById('nama').value.trim();
+      const wa = document.getElementById('wa').value.trim();
+      const unit = document.getElementById('unit').value;
+      const alamat = document.getElementById('alamat').value.trim();
+      const kontak = document.getElementById('kontak').value.trim();
+      if (!nama || !wa || !unit || !alamat || !kontak) {
+        alert('Lengkapi semua data diri!'); return;
+      }
+    }
+    if (n === 4 && currentStep === 3) {
+      if (!uploads.ktp || !uploads.selfie || !uploads.rumah) {
+        alert('Upload semua dokumen terlebih dahulu!'); return;
+      }
+      // Update summary
+      calcHarga();
+    }
+
+    currentStep = n;
+
+    // Hide all steps
+    [1,2,3,4].forEach(i => {
+      document.getElementById('step-' + i).style.display = i === n ? 'block' : 'none';
+    });
+
+    // Update step indicators
+    [1,2,3,4].forEach(i => {
+      const el = document.getElementById('step' + i);
+      el.classList.remove('active','done');
+      if (i === n) el.classList.add('active');
+      if (i < n) el.classList.add('done');
+    });
+    [1,2,3].forEach(i => {
+      const line = document.getElementById('line' + i);
+      line.classList.toggle('done', i < n);
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleDoc(type, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('prev-' + type).innerHTML = '<img src="' + e.target.result + '" alt="preview">';
+      document.getElementById('dc-' + type).classList.add('uploaded');
+      document.getElementById('stat-' + type).textContent = '✓ Terupload';
+      uploads[type] = true;
+      updateDocChecklist();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateDocChecklist() {
+    const map = { ktp: 'KTP', selfie: 'Selfie', rumah: 'Rumah' };
+    let allDone = true;
+    Object.keys(uploads).forEach(k => {
+      const el = document.getElementById('ck-' + k);
+      if (uploads[k]) {
+        el.style.background = 'var(--green-dim)';
+        el.style.borderColor = 'var(--green)';
+        el.style.color = 'var(--green)';
+        el.textContent = '✓ ' + map[k];
+      } else { allDone = false; }
+    });
+    document.getElementById('btn-step4').disabled = !allDone;
+  }
+
+  function checkAllAck() {
+    const internet = document.getElementById('ack-internet').checked;
+    const tnc = document.getElementById('ack-tnc').checked;
+    const telat = document.getElementById('ack-telat').checked;
+    const guest = isGuest ? document.getElementById('ack-guest').checked : true;
+    const psn = !isGuest ? document.getElementById('ack-psn').checked : true;
+    const ok = internet && tnc && telat && guest && psn;
+    document.getElementById('btn-submit').disabled = !ok;
+  }
+
+  function submitBooking() {
+    const nama = document.getElementById('nama').value.trim();
+    const wa = document.getElementById('wa').value.trim();
+    const unit = document.getElementById('unit').value;
+    const alamat = document.getElementById('alamat').value.trim();
+    const kontak = document.getElementById('kontak').value.trim();
+    const tglMulai = document.getElementById('tgl-mulai').value;
+    const tglKembali = document.getElementById('tgl-kembali').value;
+    const { harga, total, label, durasi } = calcHarga();
+    const bookingId = '#RP' + Date.now().toString().slice(-5);
+    const totalStr = 'Rp ' + total.toLocaleString('id-ID');
+
+    lastBookingData = { bookingId, nama, wa, unit, tglMulai, tglKembali, harga, total, totalStr, label };
+
+    // Fill success screen
+    document.getElementById('k-id').textContent = bookingId;
+    document.getElementById('k-nama').textContent = nama;
+    document.getElementById('k-unit').textContent = unit;
+    document.getElementById('k-paket').textContent = PAKET_LABEL[currentPaket];
+    document.getElementById('k-tgl').textContent = tglMulai + ' → ' + tglKembali;
+    document.getElementById('k-total').textContent = totalStr;
+
+    // Show success
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Auto open WA owner after 1.5s
+    setTimeout(() => {
+      const pesanOwner =
+`🎮 *BOOKING BARU — RIVALS PLAY*
+━━━━━━━━━━━━━━━━
+📋 *ID:* ${bookingId}
+👤 *Nama:* ${nama}
+📱 *WA:* ${wa}
+🎮 *Unit:* ${unit}
+📦 *Paket:* ${PAKET_LABEL[currentPaket]}
+📅 *Mulai:* ${tglMulai}
+📅 *Kembali:* ${tglKembali}
+⏱ *Durasi:* ${label}
+📍 *Alamat:* ${alamat}
+🆘 *Darurat:* ${kontak}
+━━━━━━━━━━━━━━━━
+💰 *Total:* ${totalStr}
+📎 Dokumen: KTP ✓ Selfie ✓ Rumah ✓
+━━━━━━━━━━━━━━━━
+_Segera konfirmasi ke penyewa!_`;
+      window.open('https://wa.me/' + OWNER_WA + '?text=' + encodeURIComponent(pesanOwner), '_blank');
+    }, 1500);
+  }
+
+  function shareWA() {
+    if (!lastBookingData) return;
+    const d = lastBookingData;
+    const msg =
+`Halo *${d.nama}* 👋
+
+Terima kasih sudah booking *Rivals Play Purwokerto*! 🎮
+
+📋 *${d.bookingId}*
+🎮 Unit: ${d.unit}
+📦 Paket: ${PAKET_LABEL[currentPaket]}
+📅 ${d.tglMulai} → ${d.tglKembali}
+💰 Total: *${d.totalStr}*
+
+*Langkah selanjutnya:*
+1️⃣ Transfer *Rp 200.000* (deposit) ke rekening kami
+2️⃣ Kirim bukti transfer ke WA ini
+
+Kami akan konfirmasi & jadwalkan pengiriman unit setelah deposit diterima.
+
+Terima kasih! 🙏
+_Rivals Play Purwokerto_`;
+
+    const num = d.wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  function copyBukti() {
+    if (!lastBookingData) return;
+    const d = lastBookingData;
+    const text = `BUKTI BOOKING — RIVALS PLAY
+ID: ${d.bookingId}
+Nama: ${d.nama}
+Unit: ${d.unit}
+Paket: ${PAKET_LABEL[currentPaket]}
+Tanggal: ${d.tglMulai} → ${d.tglKembali}
+Total: ${d.totalStr}
+Deposit: Rp 200.000 (refundable)
+Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
+    navigator.clipboard.writeText(text)
+      .then(() => alert('✅ Bukti booking berhasil dicopy!'))
+      .catch(() => alert('Coba copy manual ya.'));
+  }
+
+  function bookingLagi() {
+    location.reload();
+  }
+
+  // INIT
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tgl-mulai').value = today;
+  calcHarga();
+  selectPaket('harian-full');
+</script>
+</body>
+</html>

@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Card — Rivals Play</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --border: #282828;
+    --accent: #00e5ff;
+    --accent-dim: rgba(0,229,255,0.1);
+    --green: #00c853;
+    --green-dim: rgba(0,200,83,0.1);
+    --yellow: #ffd600;
+    --yellow-dim: rgba(255,214,0,0.1);
+    --red: #ff1744;
+    --red-dim: rgba(255,23,68,0.08);
+    --gold: #FFD700;
+    --gold-dim: rgba(255,215,0,0.1);
+    --silver: #C0C0C0;
+    --purple: #d500f9;
+    --text: #f0f0f0;
+    --muted: #666;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+  .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--gold), #ff6d00); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .logo span { color: var(--gold); }
+
+  .header-right { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 24px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; }
+  .tab { padding: 8px 18px; border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--muted); transition: all 0.15s; font-family: var(--font); }
+  .tab.active { background: linear-gradient(135deg, var(--gold), #ff6d00); color: #000; font-weight: 700; }
+  .tab:not(.active):hover { color: var(--text); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .stat-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .stat-value { font-size: 22px; font-weight: 700; font-family: var(--mono); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.accent { color: var(--accent); }
+
+  /* MEMBER GRID */
+  .member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 28px; }
+
+  /* KARTU MEMBER - VISUAL */
+  .member-card-visual {
+    border-radius: 16px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .member-card-visual:hover { transform: translateY(-3px); }
+
+  .member-card-visual.tier-bronze {
+    background: linear-gradient(135deg, #3e2723, #6d4c41);
+    border: 1px solid #8d6e63;
+  }
+
+  .member-card-visual.tier-silver {
+    background: linear-gradient(135deg, #263238, #455a64);
+    border: 1px solid var(--silver);
+  }
+
+  .member-card-visual.tier-gold {
+    background: linear-gradient(135deg, #4a3000, #7a5200);
+    border: 1px solid var(--gold);
+    box-shadow: 0 4px 24px rgba(255,215,0,0.15);
+  }
+
+  .member-card-visual.tier-platinum {
+    background: linear-gradient(135deg, #1a0030, #3a0060);
+    border: 1px solid var(--purple);
+    box-shadow: 0 4px 24px rgba(213,0,249,0.15);
+  }
+
+  /* Card decorative circles */
+  .card-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+
+  .card-circle.c1 { width: 180px; height: 180px; top: -60px; right: -40px; background: #fff; }
+  .card-circle.c2 { width: 100px; height: 100px; bottom: -30px; left: 20px; background: #fff; }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+  .card-brand { font-size: 13px; font-weight: 800; letter-spacing: 2px; opacity: 0.8; }
+  .card-tier-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: rgba(255,255,255,0.15); letter-spacing: 1px; }
+
+  .card-chip { width: 32px; height: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1)); border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); margin: 14px 0 8px; position: relative; z-index: 1; }
+
+  .card-bottom { position: relative; z-index: 1; }
+  .card-name { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .card-id { font-family: var(--mono); font-size: 11px; opacity: 0.6; margin-bottom: 8px; }
+
+  .card-punches { display: flex; gap: 6px; }
+  .punch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .punch.used { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.6); }
+  .punch-label { font-size: 10px; opacity: 0.6; margin-left: 4px; align-self: center; }
+
+  .card-exp { font-size: 10px; opacity: 0.5; margin-top: 6px; font-family: var(--mono); }
+
+  /* MEMBER INFO BOX */
+  .member-info-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .member-info-left { display: flex; flex-direction: column; gap: 3px; }
+  .member-info-name { font-size: 14px; font-weight: 700; }
+  .member-info-meta { font-size: 12px; color: var(--muted); }
+
+  .member-info-right { display: flex; gap: 8px; }
+  .m-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: var(--font); transition: all 0.15s; }
+  .m-btn.primary { background: var(--gold); color: #000; border-color: var(--gold); }
+  .m-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .m-btn.primary:hover { opacity: 0.85; color: #000; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+
+  /* FORM */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; transition: border-color 0.15s; width: 100%; }
+  input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+  select option { background: var(--surface2); }
+  .submit-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--gold), #ff6d00); color: #000; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); margin-top: 14px; }
+
+  /* TIER INFO */
+  .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+
+  .tier-card {
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .tier-card.bronze { background: linear-gradient(135deg, #3e2723, #6d4c41); border-color: #8d6e63; }
+  .tier-card.silver { background: linear-gradient(135deg, #263238, #455a64); border-color: var(--silver); }
+  .tier-card.gold { background: linear-gradient(135deg, #4a3000, #7a5200); border-color: var(--gold); }
+  .tier-card.platinum { background: linear-gradient(135deg, #1a0030, #3a0060); border-color: var(--purple); }
+
+  .tier-icon { font-size: 28px; margin-bottom: 8px; }
+  .tier-name { font-size: 13px; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
+  .tier-req { font-size: 11px; opacity: 0.6; margin-bottom: 10px; }
+  .tier-perks { font-size: 11px; opacity: 0.8; line-height: 1.8; text-align: left; }
+
+  /* TUKAR GAME LOG */
+  .log-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .log-table { width: 100%; border-collapse: collapse; }
+  .log-table th { text-align: left; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .log-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tbody tr:hover { background: var(--surface2); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 90%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-cancel { flex: 1; padding: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--text); }
+  .modal-confirm { flex: 2; padding: 11px; background: linear-gradient(135deg, var(--gold), #ff6d00); border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); color: #000; }
+
+  .punch-display { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+  .punch-big { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; cursor: pointer; }
+  .punch-big.used { background: var(--gold-dim); border-color: var(--gold); }
+  .punch-big.available { border-color: var(--green); }
+
+  .game-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; width: 100%; margin-top: 12px; }
+  .game-input:focus { border-color: var(--gold); }
+
+  .reward-banner { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--gold); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: 1fr 1fr; }
+    .member-grid { grid-template-columns: 1fr; }
+  }
+
+  /* EARLY ACCESS */
+  .ea-header {
+    background: linear-gradient(135deg, #1a0030, #4a0080);
+    border: 1px solid var(--purple);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ea-header::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(213,0,249,0.08);
+    top: -60px; right: -40px;
+  }
+
+  .ea-header-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; position: relative; z-index: 1; }
+  .ea-header-sub { font-size: 13px; color: rgba(255,255,255,0.6); position: relative; z-index: 1; }
+
+  .ea-timeline {
+    display: flex;
+    gap: 0;
+    margin: 20px 0 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ea-phase {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    position: relative;
+  }
+
+  .ea-phase.ph1 { background: rgba(213,0,249,0.2); border: 1px solid var(--purple); color: #e040fb; }
+  .ea-phase.ph2 { background: rgba(192,192,192,0.1); border: 1px solid var(--silver); color: var(--silver); margin: 0 6px; }
+  .ea-phase.ph3 { background: rgba(255,215,0,0.1); border: 1px solid #888; color: #aaa; }
+
+  .ea-phase-days { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+  .ea-phase-label { font-size: 10px; opacity: 0.8; }
+
+  .game-new-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  .game-new-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+
+  .game-new-card:hover { transform: translateY(-2px); }
+
+  .game-new-img {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    position: relative;
+  }
+
+  .game-new-img.type-action { background: linear-gradient(135deg, #1a0000, #4a0000); }
+  .game-new-img.type-sport { background: linear-gradient(135deg, #001a00, #004a00); }
+  .game-new-img.type-adventure { background: linear-gradient(135deg, #00001a, #00004a); }
+  .game-new-img.type-racing { background: linear-gradient(135deg, #1a0a00, #4a2000); }
+
+  .ea-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .ea-badge.live { background: rgba(213,0,249,0.3); color: #e040fb; border: 1px solid var(--purple); }
+  .ea-badge.soon { background: rgba(255,214,0,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+  .ea-badge.open { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+
+  .game-new-body { padding: 14px; }
+  .game-new-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .game-new-meta { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+
+  .access-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .access-chip {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .access-chip.yes { background: rgba(0,200,83,0.15); color: var(--green); border: 1px solid var(--green); }
+  .access-chip.wait { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .access-chip.highlight { background: rgba(213,0,249,0.15); color: #e040fb; border: 1px solid var(--purple); }
+
+  .request-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+  }
+
+  .request-btn.active { background: var(--purple); color: #fff; }
+  .request-btn.waiting { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); cursor: default; }
+
+  .add-game-form { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 24px; }
+  .add-game-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+  .add-game-btn { padding: 10px 16px; background: var(--purple); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); white-space: nowrap; }
+
+  .request-log { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .req-table { width: 100%; border-collapse: collapse; }
+  .req-table th { text-align: left; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .req-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .req-table tr:last-child td { border-bottom: none; }
+  .req-table tbody tr:hover { background: var(--surface2); }
+
+  /* INVENTARIS */
+  .inv-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+
+  .game-rack { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 28px; }
+
+  .game-rack-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    transition: border-color 0.15s;
+  }
+
+  .game-rack-card.available { border-color: var(--green); }
+  .game-rack-card.partial { border-color: var(--yellow); }
+  .game-rack-card.empty { border-color: var(--red); }
+
+  .game-rack-emoji { font-size: 32px; margin-bottom: 10px; }
+  .game-rack-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .game-rack-genre { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+
+  .stock-bar-wrap { margin-bottom: 10px; }
+  .stock-bar-track { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
+  .stock-bar-fill { height: 100%; border-radius: 99px; transition: width 0.3s; }
+  .stock-bar-fill.full { background: var(--green); }
+  .stock-bar-fill.partial { background: var(--yellow); }
+  .stock-bar-fill.empty { background: var(--red); width: 100% !important; }
+  .stock-numbers { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+  .copy-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .copy-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; background: var(--surface2); border-radius: 6px; font-size: 11px; }
+  .copy-status { display: flex; align-items: center; gap: 5px; font-weight: 600; }
+  .copy-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .copy-dot.av { background: var(--green); }
+  .copy-dot.out { background: var(--red); }
+  .copy-member { font-size: 10px; color: var(--muted); }
+
+  .inv-add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+  .inv-form-grid { display: grid; grid-template-columns: 1fr 1fr 80px 80px auto; gap: 10px; align-items: end; }
+  .inv-add-btn { padding: 10px 14px; background: var(--green); color: #000; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); white-space: nowrap; }
+
+  .alert-box { background: var(--red-dim); border: 1px solid var(--red); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: var(--red); display: none; }
+  .alert-box.show { display: flex; gap: 10px; align-items: flex-start; }
+
+  @media (max-width: 640px) {
+    .inv-stats { grid-template-columns: 1fr 1fr; }
+    .inv-form-grid { grid-template-columns: 1fr 1fr; }
+    .game-rack { grid-template-columns: 1fr; }
+  }
+
+  /* DENDA */
+  .denda-cat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+
+  .denda-cat-card {
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .denda-cat-card.cat-a { background: var(--green-dim); border-color: var(--green); }
+  .denda-cat-card.cat-b { background: var(--yellow-dim); border-color: var(--yellow); }
+  .denda-cat-card.cat-c { background: rgba(255,109,0,0.08); border-color: var(--orange); }
+  .denda-cat-card.cat-d { background: var(--red-dim); border-color: var(--red); }
+
+  .denda-cat-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
+  .cat-a .denda-cat-label { color: var(--green); }
+  .cat-b .denda-cat-label { color: var(--yellow); }
+  .cat-c .denda-cat-label { color: var(--orange); }
+  .cat-d .denda-cat-label { color: var(--red); }
+
+  .denda-cat-amount { font-size: 18px; font-weight: 800; font-family: var(--mono); margin-bottom: 6px; }
+  .denda-cat-desc { font-size: 11px; opacity: 0.7; line-height: 1.6; }
+
+  .denda-form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 24px; }
+
+  .denda-preview {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .denda-preview.show { display: block; }
+
+  .denda-preview-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .denda-preview-row:last-child { border-bottom: none; font-weight: 700; font-size: 15px; }
+  .denda-preview-row.total span:last-child { color: var(--red); font-family: var(--mono); }
+  .denda-preview-row.discount span:last-child { color: var(--green); font-family: var(--mono); }
+  .denda-preview-row span:last-child { font-family: var(--mono); font-weight: 600; }
+
+  .denda-konfirm-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    margin-top: 14px;
+    display: none;
+  }
+
+  .denda-konfirm-btn.show { display: block; }
+
+  .banding-badge {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .denda-log-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .denda-table { width: 100%; border-collapse: collapse; }
+  .denda-table th { text-align: left; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .denda-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .denda-table tr:last-child td { border-bottom: none; }
+  .denda-table tbody tr:hover { background: var(--surface2); }
+
+  .status-lunas { background: var(--green-dim); color: var(--green); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .status-pending { background: var(--yellow-dim); color: var(--yellow); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .status-banding { background: var(--accent-dim); color: var(--accent); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .status-bebas { background: var(--surface2); color: var(--muted); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+
+  .cat-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .cat-pill-a { background: var(--green-dim); color: var(--green); }
+  .cat-pill-b { background: var(--yellow-dim); color: var(--yellow); }
+  .cat-pill-c { background: rgba(255,109,0,0.1); color: var(--orange); }
+  .cat-pill-d { background: var(--red-dim); color: var(--red); }
+
+  @media (max-width: 640px) {
+    .denda-cat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎮</div>
+    <div>Rivals <span>Play</span> — Member</div>
+  </div>
+  <div class="header-right" id="member-count-header">0 member aktif</div>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('member')">Kartu Member</button>
+    <button class="tab" onclick="switchTab('daftar')">Daftar Member</button>
+    <button class="tab" onclick="switchTab('tukar')">Log Tukar Game</button>
+    <button class="tab" onclick="switchTab('tier')">Sistem Tier</button>
+    <button class="tab" onclick="switchTab('tambah')">+ Tambah Member</button>
+    <button class="tab" onclick="switchTab('earlyaccess')">🎮 Early Access</button>
+    <button class="tab" onclick="switchTab('inventaris')">📦 Inventaris</button>
+    <button class="tab" onclick="switchTab('denda')">⚠️ Denda</button>
+  </div>
+
+  <!-- KARTU MEMBER -->
+  <div class="panel active" id="panel-member">
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Member</div>
+        <div class="stat-value gold" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Aktif Bulan Ini</div>
+        <div class="stat-value green" id="stat-aktif">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tukar Game Bulan Ini</div>
+        <div class="stat-value accent" id="stat-tukar">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Member Gold+</div>
+        <div class="stat-value" style="color:var(--gold)" id="stat-gold">0</div>
+      </div>
+    </div>
+
+    <div class="section-title">Kartu Member Aktif</div>
+    <div class="member-grid" id="member-grid">
+      <div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px;font-size:14px">
+        Belum ada member. Tambahkan member pertama! 🎮
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DAFTAR MEMBER -->
+  <div class="panel" id="panel-daftar">
+    <div class="section-title">Semua Member</div>
+    <div class="log-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Tier</th>
+            <th>Unit</th>
+            <th>Bergabung</th>
+            <th>Tukar Bulan Ini</th>
+            <th>Total Tukar</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="daftar-tbody">
+          <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">Belum ada member.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOG TUKAR GAME -->
+  <div class="panel" id="panel-tukar">
+    <div class="section-header">
+      <div class="section-title">Log Tukar Game</div>
+      <button class="m-btn primary" onclick="openTukarModal(null)">+ Catat Tukar Game</button>
+    </div>
+    <div class="log-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Member</th>
+            <th>Game Dikembalikan</th>
+            <th>Game Baru</th>
+            <th>Tukar ke-</th>
+          </tr>
+        </thead>
+        <tbody id="tukar-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Belum ada log tukar game.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TIER SYSTEM -->
+  <div class="panel" id="panel-tier">
+
+    <div class="section-title">Sistem Tier Member</div>
+    <div class="tier-grid">
+      <div class="tier-card bronze">
+        <div class="tier-icon">🥉</div>
+        <div class="tier-name">BRONZE</div>
+        <div class="tier-req">Bulan 1–3</div>
+        <div class="tier-perks">
+          +0 slot & tukar<br>
+          ✓ Kartu member fisik<br>
+          ✓ Priority booking<br>
+          <span style="opacity:0.5;font-size:10px">Sesuai paket awal</span>
+        </div>
+      </div>
+      <div class="tier-card silver">
+        <div class="tier-icon">🥈</div>
+        <div class="tier-name">SILVER</div>
+        <div class="tier-req">Bulan 4–6</div>
+        <div class="tier-perks">
+          +1 slot game<br>
+          +1x tukar/bln<br>
+          ✓ Diskon Rp 50rb/bln<br>
+          ✓ Early access hari 4
+        </div>
+      </div>
+      <div class="tier-card gold">
+        <div class="tier-icon">🥇</div>
+        <div class="tier-name">GOLD</div>
+        <div class="tier-req">Bulan 7–12</div>
+        <div class="tier-perks">
+          +2 slot game<br>
+          +2x tukar/bln<br>
+          ✓ Diskon Rp 100rb/bln<br>
+          ✓ Early access hari 1<br>
+          ✓ Request game baru
+        </div>
+      </div>
+      <div class="tier-card platinum">
+        <div class="tier-icon">💎</div>
+        <div class="tier-name">PLATINUM</div>
+        <div class="tier-req">Bulan 13+</div>
+        <div class="tier-perks">
+          +3 slot game<br>
+          +3x tukar/bln<br>
+          ✓ Diskon Rp 150rb/bln<br>
+          ✓ Early access hari 1<br>
+          ✓ Free ongkir antar<br>
+          ✓ Request unit baru
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
+      <div class="section-title" style="margin-bottom:12px">💡 Cara Kerja Punch Card</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:13px;color:var(--muted);padding:10px;background:var(--surface2);border-radius:8px;line-height:1.6">
+          🎮 <strong style="color:var(--text)">2x per bulan</strong> — member dateng ke Rivals Play, bawa disc yang mau ditukar, tunjukkan kartu member, punch!
+        </div>
+        <div style="font-size:13px;color:var(--muted);padding:10px;background:var(--surface2);border-radius:8px;line-height:1.6">
+          📅 <strong style="color:var(--text)">Reset tiap bulan</strong> — punch card reset di tanggal anniversary member, bukan tanggal 1.
+        </div>
+        <div style="font-size:13px;color:var(--muted);padding:10px;background:var(--surface2);border-radius:8px;line-height:1.6">
+          🎁 <strong style="color:var(--text)">Reward bulan ke-6</strong> — member yang loyal 6 bulan dapat 1x tukar game gratis bonus + naik tier Silver otomatis.
+        </div>
+        <div style="font-size:13px;color:var(--muted);padding:10px;background:var(--surface2);border-radius:8px;line-height:1.6">
+          💎 <strong style="color:var(--text)">Naik tier otomatis</strong> — sistem track otomatis berapa bulan member aktif, tier naik sendiri.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAMBAH MEMBER -->
+  <div class="panel" id="panel-tambah">
+    <div class="form-card">
+      <div class="section-title" style="margin-bottom:16px">Daftarkan Member Baru</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="m-nama" placeholder="Nama member">
+        </div>
+        <div class="form-group">
+          <label>No. WhatsApp</label>
+          <input type="text" id="m-wa" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>Unit Disewa</label>
+          <select id="m-unit">
+            <option value="UNIT-01">UNIT-01</option>
+            <option value="UNIT-02">UNIT-02</option>
+            <option value="UNIT-03">UNIT-03</option>
+            <option value="UNIT-04">UNIT-04</option>
+            <option value="UNIT-05">UNIT-05</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Mulai Berlangganan</label>
+          <input type="date" id="m-mulai">
+        </div>
+        <div class="form-group">
+          <label>Paket Member</label>
+          <select id="m-paket">
+            <option value="member-basic">Basic (3 slot, 2x tukar)</option>
+            <option value="member-plus">Plus (4 slot, 3x tukar)</option>
+            <option value="member-premium">Premium (5 slot, 4x tukar)</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Game Awal</label>
+          <input type="text" id="m-game" placeholder="Contoh: FC 26, Spider-Man 2, GTA V">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="addMember()">🎮 Daftarkan Member</button>
+    </div>
+
+    <!-- PREVIEW KARTU -->
+    <div class="section-title">Preview Kartu Member</div>
+    <div style="max-width:340px">
+      <div class="member-card-visual tier-bronze" id="preview-card">
+        <div class="card-circle c1"></div>
+        <div class="card-circle c2"></div>
+        <div class="card-top">
+          <div class="card-brand">RIVALS PLAY</div>
+          <div class="card-tier-badge">BRONZE</div>
+        </div>
+        <div class="card-chip"></div>
+        <div class="card-bottom">
+          <div class="card-name" id="preview-name">NAMA MEMBER</div>
+          <div class="card-id" id="preview-id">RP-0001</div>
+          <div class="card-punches">
+            <div class="punch" id="prev-p1">○</div>
+            <div class="punch" id="prev-p2">○</div>
+            <div class="punch-label">tukar/bln</div>
+          </div>
+          <div class="card-exp" id="preview-exp">Bergabung: —</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- EARLY ACCESS -->
+  <div class="panel" id="panel-earlyaccess">
+
+    <div class="ea-header">
+      <div class="ea-header-title">🎮 Early Access — Game Baru Rilis</div>
+      <div class="ea-header-sub">Member tier tinggi dapat akses game baru lebih cepat sebelum dibuka ke semua member</div>
+      <div class="ea-timeline">
+        <div class="ea-phase ph1">
+          <div class="ea-phase-days">Hari 1–3</div>
+          <div class="ea-phase-label">💎 Platinum & 🥇 Gold only</div>
+        </div>
+        <div class="ea-phase ph2">
+          <div class="ea-phase-days">Hari 4–7</div>
+          <div class="ea-phase-label">+ 🥈 Silver</div>
+        </div>
+        <div class="ea-phase ph3">
+          <div class="ea-phase-days">Hari 8+</div>
+          <div class="ea-phase-label">Semua member</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Game Baru Tersedia</div>
+      <button class="add-game-btn" onclick="toggleAddGame()">+ Tambah Game Baru</button>
+    </div>
+
+    <div class="add-game-form" id="add-game-form" style="display:none">
+      <div class="section-title" style="margin-bottom:12px">Tambah Game Baru Rilis</div>
+      <div class="add-game-grid">
+        <div class="form-group">
+          <label>Nama Game</label>
+          <input type="text" id="ea-game-nama" placeholder="Contoh: GTA VI">
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select id="ea-game-genre">
+            <option value="action">Action</option>
+            <option value="sport">Sport</option>
+            <option value="adventure">Adventure</option>
+            <option value="racing">Racing</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Masuk</label>
+          <input type="date" id="ea-game-tgl">
+        </div>
+        <button class="add-game-btn" onclick="addEAGame()">Tambah</button>
+      </div>
+    </div>
+
+    <div class="game-new-grid" id="ea-game-grid">
+      <div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-size:14px">
+        Belum ada game baru. Tambahkan game baru rilis! 🎮
+      </div>
+    </div>
+
+    <div class="section-title">Log Request Early Access</div>
+    <div class="request-log">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Member</th>
+            <th>Tier</th>
+            <th>Game</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="req-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Belum ada request.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- DENDA -->
+  <div class="panel" id="panel-denda">
+
+    <div class="section-title">Kategori Kerusakan & Denda</div>
+    <div class="denda-cat-grid">
+      <div class="denda-cat-card cat-a">
+        <div class="denda-cat-label">KATEGORI A</div>
+        <div class="denda-cat-amount" style="color:var(--green)">Rp 0</div>
+        <div class="denda-cat-desc">Wajar — lecet halus, sidik jari, baret sangat ringan. Resiko normal pemakaian.</div>
+      </div>
+      <div class="denda-cat-card cat-b">
+        <div class="denda-cat-label">KATEGORI B</div>
+        <div class="denda-cat-amount" style="color:var(--yellow)">Rp 25–50rb</div>
+        <div class="denda-cat-desc">Kelalaian ringan — baret sedang, kabel tertekuk, controller kotor parah.</div>
+      </div>
+      <div class="denda-cat-card cat-c">
+        <div class="denda-cat-label">KATEGORI C</div>
+        <div class="denda-cat-amount" style="color:var(--orange)">Rp 50–150rb</div>
+        <div class="denda-cat-desc">Kelalaian sedang — controller drift, port longgar, kaset baret dalam.</div>
+      </div>
+      <div class="denda-cat-card cat-d">
+        <div class="denda-cat-label">KATEGORI D</div>
+        <div class="denda-cat-amount" style="color:var(--red)">Harga Servis</div>
+        <div class="denda-cat-desc">Kerusakan berat — layar retak, konsol jatuh, game hilang, controller rusak total.</div>
+      </div>
+    </div>
+
+    <div class="banding-badge">
+      <span>💡</span>
+      <div>
+        <strong>Aturan Fair:</strong> Customer yang <strong>lapor sendiri</strong> sebelum lo temukan → diskon denda 20%.
+        Member <strong>Platinum</strong> bebas denda Kategori B.
+        Banding bisa dilakukan dalam <strong>24 jam</strong> setelah denda dijatuhkan.
+      </div>
+    </div>
+
+    <div class="section-title">Catat Denda Baru</div>
+    <div class="denda-form-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Pilih Member</label>
+          <select id="denda-member" onchange="onDendaMemberChange()">
+            <option value="">— Pilih Member —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Item Rusak</label>
+          <select id="denda-item">
+            <option value="konsol">Konsol PS5</option>
+            <option value="controller">Controller / DualSense</option>
+            <option value="monitor">Monitor</option>
+            <option value="game">Game Fisik</option>
+            <option value="kabel">Kabel / Aksesoris</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kategori Kerusakan</label>
+          <select id="denda-kategori" onchange="calcDenda()">
+            <option value="A">A — Wajar (Rp 0)</option>
+            <option value="B">B — Kelalaian Ringan (Rp 25–50rb)</option>
+            <option value="C">C — Kelalaian Sedang (Rp 50–150rb)</option>
+            <option value="D">D — Kerusakan Berat (Harga Servis)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nominal Denda (Rp)</label>
+          <input type="number" id="denda-nominal" placeholder="0" oninput="calcDenda()">
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi Kerusakan</label>
+          <input type="text" id="denda-desc" placeholder="Contoh: Controller kiri drift, joystick gerak sendiri saat dilepas">
+        </div>
+        <div class="form-group">
+          <label>Customer Lapor Sendiri?</label>
+          <select id="denda-lapor" onchange="calcDenda()">
+            <option value="tidak">Tidak (lo yang temukan)</option>
+            <option value="ya">Ya (customer lapor duluan) → -20%</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status Pembayaran</label>
+          <select id="denda-status">
+            <option value="pending">Pending</option>
+            <option value="lunas">Lunas</option>
+            <option value="banding">Banding</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="denda-preview" id="denda-preview">
+        <div class="section-title" style="margin-bottom:12px">Preview Denda</div>
+        <div class="denda-preview-row"><span>Member</span><span id="prev-denda-member">—</span></div>
+        <div class="denda-preview-row"><span>Item</span><span id="prev-denda-item">—</span></div>
+        <div class="denda-preview-row"><span>Kategori</span><span id="prev-denda-kat">—</span></div>
+        <div class="denda-preview-row"><span>Nominal Denda</span><span id="prev-denda-nominal">Rp 0</span></div>
+        <div class="denda-preview-row discount" id="prev-discount-row" style="display:none"><span>Diskon Lapor Sendiri (-20%)</span><span id="prev-denda-diskon">-Rp 0</span></div>
+        <div class="denda-preview-row" id="prev-plat-row" style="display:none"><span>Bebas Denda (Platinum Cat.B)</span><span style="color:var(--purple)">Rp 0</span></div>
+        <div class="denda-preview-row total"><span>Total Dibayar</span><span id="prev-denda-total">Rp 0</span></div>
+      </div>
+
+      <button class="denda-konfirm-btn" id="denda-konfirm-btn" onclick="submitDenda()">⚠️ Konfirmasi & Catat Denda</button>
+    </div>
+
+    <div class="section-title">Riwayat Denda</div>
+    <div class="denda-log-wrap">
+      <table class="denda-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Member</th>
+            <th>Item</th>
+            <th>Kategori</th>
+            <th>Nominal</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="denda-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Belum ada catatan denda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- INVENTARIS -->
+  <div class="panel" id="panel-inventaris">
+
+    <div class="alert-box" id="inv-alert">
+      ⚠️ <div id="inv-alert-text">Ada game yang stoknya habis!</div>
+    </div>
+
+    <div class="inv-stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Judul</div>
+        <div class="stat-value" style="color:var(--accent)" id="inv-total-judul">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Copy</div>
+        <div class="stat-value" id="inv-total-copy">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Lagi Dipinjam</div>
+        <div class="stat-value" style="color:var(--yellow)" id="inv-dipinjam">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Stok Habis</div>
+        <div class="stat-value" style="color:var(--red)" id="inv-habis">0</div>
+      </div>
+    </div>
+
+    <div class="section-title">Tambah Game ke Inventaris</div>
+    <div class="inv-add-form">
+      <div class="inv-form-grid">
+        <div class="form-group">
+          <label>Nama Game</label>
+          <input type="text" id="inv-nama" placeholder="Contoh: FC 26">
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select id="inv-genre">
+            <option value="sport">⚽ Sport</option>
+            <option value="action">⚔️ Action</option>
+            <option value="adventure">🗺️ Adventure</option>
+            <option value="racing">🏎️ Racing</option>
+            <option value="rpg">🧙 RPG</option>
+            <option value="horror">👻 Horror</option>
+            <option value="other">🎮 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Jumlah Copy</label>
+          <input type="number" id="inv-copy" value="1" min="1" max="10">
+        </div>
+        <div class="form-group">
+          <label>Harga (rb)</label>
+          <input type="number" id="inv-harga" placeholder="700">
+        </div>
+        <button class="inv-add-btn" onclick="addGameInv()">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="section-title">Rak Game</div>
+    <div class="game-rack" id="game-rack">
+      <div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-size:14px">
+        Belum ada game di inventaris. Tambahkan game dulu!
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL TUKAR GAME -->
+<div class="modal-overlay" id="modal-tukar">
+  <div class="modal">
+    <div class="modal-title">🎮 Catat Tukar Game</div>
+
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Pilih Member</label>
+      <select id="tukar-member-select">
+        <option value="">— Pilih Member —</option>
+      </select>
+    </div>
+
+    <div id="punch-section" style="display:none">
+      <div class="reward-banner" id="reward-banner" style="display:none">
+        🎁 Member ini sudah 6 bulan! Dapat 1x tukar game bonus gratis!
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Punch card bulan ini:</div>
+      <div class="punch-display">
+        <div class="punch-big" id="punch1">○</div>
+        <div class="punch-big" id="punch2">○</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px" id="punch-status">Sisa tukar bulan ini: —</div>
+
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Game Dikembalikan</label>
+        <input type="text" class="game-input" id="game-kembali" placeholder="Nama game yang dikembalikan">
+      </div>
+      <div class="form-group">
+        <label>Game Baru</label>
+        <input type="text" class="game-input" id="game-baru" placeholder="Nama game yang diambil">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeTukarModal()">Batal</button>
+      <button class="modal-confirm" onclick="submitTukar()">✓ Catat Tukar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL MEMBER -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <div id="detail-card-wrap" style="margin-bottom:20px"></div>
+    <div id="detail-info" style="font-size:13px;line-height:2;color:var(--muted)"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDetailModal()">Tutup</button>
+      <button class="modal-confirm" onclick="tukarFromDetail()">🎮 Tukar Game</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let members = JSON.parse(localStorage.getItem('rp_members') || '[]');
+  let tukarLog = JSON.parse(localStorage.getItem('rp_tukar') || '[]');
+  let currentMemberId = null;
+
+  const TIERS = [
+    { name: 'BRONZE',   minMonth: 1,  maxMonth: 3,   bonusSlot: 0, bonusTukar: 0, icon: '🥉', class: 'tier-bronze' },
+    { name: 'SILVER',   minMonth: 4,  maxMonth: 6,   bonusSlot: 1, bonusTukar: 1, icon: '🥈', class: 'tier-silver' },
+    { name: 'GOLD',     minMonth: 7,  maxMonth: 12,  bonusSlot: 2, bonusTukar: 2, icon: '🥇', class: 'tier-gold' },
+    { name: 'PLATINUM', minMonth: 13, maxMonth: 999, bonusSlot: 3, bonusTukar: 3, icon: '💎', class: 'tier-platinum' }
+  ];
+
+  // Base paket stats
+  const PAKET_BASE = {
+    'member-basic':   { slot: 3, tukar: 2, label: 'Basic' },
+    'member-plus':    { slot: 4, tukar: 3, label: 'Plus' },
+    'member-premium': { slot: 5, tukar: 4, label: 'Premium' },
+    'harian-full':    { slot: 0, tukar: 0, label: 'Harian Full' },
+    'harian-guest':   { slot: 0, tukar: 0, label: 'Harian Guest' }
+  };
+
+  function getMemberStats(member) {
+    const tier = getTier(member);
+    const base = PAKET_BASE[member.paket] || { slot: 3, tukar: 2 };
+    return {
+      slot: base.slot + tier.bonusSlot,
+      tukar: base.tukar + tier.bonusTukar,
+      tier
+    };
+  }
+
+  function getTier(member) {
+    const months = Math.max(1, getMonthsActive(member));
+    return TIERS.find(t => months >= t.minMonth && months <= t.maxMonth) || TIERS[0];
+  }
+
+  function getMonthsActive(member) {
+    const start = new Date(member.mulai);
+    const now = new Date();
+    return Math.floor((now - start) / (1000 * 60 * 60 * 24 * 30));
+  }
+
+  function getTukarThisMonth(memberId) {
+    const now = new Date();
+    return tukarLog.filter(t => {
+      const d = new Date(t.tgl);
+      return t.memberId === memberId &&
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear();
+    }).length;
+  }
+
+  function getMaxTukar(member) {
+    return getMemberStats(member).tukar;
+  }
+
+  function getGameSlots(member) {
+    return getMemberStats(member).slot;
+  }
+
+  function generateId() {
+    return 'RP-' + String(members.length + 1).padStart(4, '0');
+  }
+
+  function switchTab(name) {
+    const tabs = ['member','daftar','tukar','tier','tambah'];
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'daftar') renderDaftar();
+    if (name === 'tukar') renderTukarLog();
+    if (name === 'member') renderAll();
+  }
+
+  function addMember() {
+    const nama = document.getElementById('m-nama').value.trim();
+    const wa = document.getElementById('m-wa').value.trim();
+    const unit = document.getElementById('m-unit').value;
+    const mulai = document.getElementById('m-mulai').value;
+    const game = document.getElementById('m-game').value.trim();
+    const paket = document.getElementById('m-paket').value;
+
+    if (!nama || !wa || !mulai) { alert('Nama, WA, dan tanggal mulai wajib diisi!'); return; }
+
+    const member = { id: Date.now(), memberId: generateId(), nama, wa, unit, mulai, game, paket, status: 'aktif', ts: Date.now() };
+    members.push(member);
+    localStorage.setItem('rp_members', JSON.stringify(members));
+
+    ['m-nama','m-wa','m-game'].forEach(id => document.getElementById(id).value = '');
+    alert('✅ Member ' + nama + ' berhasil didaftarkan! ID: ' + member.memberId);
+    switchTab('member');
+  }
+
+  function renderAll() {
+    renderStats();
+    renderMemberGrid();
+    updateHeaderCount();
+    updateTukarSelect();
+  }
+
+  function updateHeaderCount() {
+    document.getElementById('member-count-header').textContent = members.filter(m => m.status === 'aktif').length + ' member aktif';
+  }
+
+  function renderStats() {
+    const now = new Date();
+    const aktif = members.filter(m => m.status === 'aktif');
+    const tukarBulanIni = tukarLog.filter(t => {
+      const d = new Date(t.tgl);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    const goldPlus = members.filter(m => {
+      const tier = getTier(m);
+      return tier.name === 'GOLD' || tier.name === 'PLATINUM';
+    }).length;
+
+    document.getElementById('stat-total').textContent = members.length;
+    document.getElementById('stat-aktif').textContent = aktif.length;
+    document.getElementById('stat-tukar').textContent = tukarBulanIni;
+    document.getElementById('stat-gold').textContent = goldPlus;
+  }
+
+  function renderMemberGrid() {
+    const grid = document.getElementById('member-grid');
+    if (!members.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px;font-size:14px">Belum ada member. Tambahkan member pertama! 🎮</div>';
+      return;
+    }
+
+    grid.innerHTML = members.map(m => {
+      const stats = getMemberStats(m);
+      const tier = stats.tier;
+      const maxTukar = stats.tukar;
+      const gameSlots = stats.slot;
+      const tukarBulanIni = getTukarThisMonth(m.id);
+      const months = getMonthsActive(m);
+
+      let punches = '';
+      for (let i = 0; i < Math.min(maxTukar, 6); i++) {
+        punches += `<div class="punch ${i < tukarBulanIni ? 'used' : ''}">
+          ${i < tukarBulanIni ? '✓' : '○'}
+        </div>`;
+      }
+
+      return `
+        <div>
+          <div class="member-card-visual ${tier.class}" onclick="openDetailModal(${m.id})">
+            <div class="card-circle c1"></div>
+            <div class="card-circle c2"></div>
+            <div class="card-top">
+              <div class="card-brand">RIVALS PLAY</div>
+              <div class="card-tier-badge">${tier.icon} ${tier.name}</div>
+            </div>
+            <div class="card-chip"></div>
+            <div class="card-bottom">
+              <div class="card-name">${m.nama.toUpperCase()}</div>
+              <div class="card-id">${m.memberId} · ${m.unit}</div>
+              <div class="card-punches">${punches}<div class="punch-label">${tukarBulanIni}/${maxTukar} tukar · ${gameSlots} slot</div></div>
+              <div class="card-exp">Bergabung: ${m.mulai} · Bulan ke-${months || 1} · ${gameSlots} slot game</div>
+            </div>
+          </div>
+          <div class="member-info-row">
+            <div class="member-info-left">
+              <div class="member-info-name">${m.nama}</div>
+              <div class="member-info-meta">${m.wa} · ${gameSlots} slot · ${maxTukar}x tukar · ${m.game || '—'}</div>
+            </div>
+            <div class="member-info-right">
+              <button class="m-btn primary" onclick="openTukarModal(${m.id})">Tukar</button>
+              <button class="m-btn" onclick="openDetailModal(${m.id})">Detail</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderDaftar() {
+    const tbody = document.getElementById('daftar-tbody');
+    if (!members.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">Belum ada member.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = members.map(m => {
+      const tier = getTier(m);
+      const tukarBulanIni = getTukarThisMonth(m.id);
+      const totalTukar = tukarLog.filter(t => t.memberId === m.id).length;
+      return `
+        <tr>
+          <td style="font-family:var(--mono);font-size:12px;color:var(--gold)">${m.memberId}</td>
+          <td style="font-weight:600">${m.nama}</td>
+          <td>
+            <div>${tier.icon} ${tier.name}</div>
+            <div style="font-size:10px;color:var(--muted)">${getMemberStats(m).slot} slot · ${getMemberStats(m).tukar}x tukar</div>
+          </td>
+          <td style="font-size:12px;color:var(--muted)">${m.unit}</td>
+          <td style="font-size:12px;color:var(--muted)">${m.mulai}</td>
+          <td style="font-family:var(--mono);font-weight:700;color:var(--accent)">${tukarBulanIni}/${tier.maxTukar > 4 ? '∞' : tier.maxTukar}</td>
+          <td style="font-family:var(--mono)">${totalTukar}x</td>
+          <td><button class="m-btn" onclick="openTukarModal(${m.id})" style="font-size:11px;padding:5px 10px">Tukar</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function renderTukarLog() {
+    const tbody = document.getElementById('tukar-tbody');
+    const sorted = [...tukarLog].sort((a,b) => b.ts - a.ts);
+    if (!sorted.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Belum ada log tukar game.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = sorted.map(t => {
+      const m = members.find(x => x.id === t.memberId);
+      return `
+        <tr>
+          <td style="font-size:12px;color:var(--muted);font-family:var(--mono)">${t.tgl}</td>
+          <td>
+            <div style="font-weight:600">${m ? m.nama : '—'}</div>
+            <div style="font-size:11px;color:var(--muted)">${m ? m.memberId : ''}</div>
+          </td>
+          <td style="color:var(--red);font-size:13px">↩ ${t.gameKembali || '—'}</td>
+          <td style="color:var(--green);font-size:13px">↪ ${t.gameBaru || '—'}</td>
+          <td style="font-family:var(--mono);font-weight:700;color:var(--gold)">ke-${t.tukarKe}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function updateTukarSelect() {
+    const sel = document.getElementById('tukar-member-select');
+    sel.innerHTML = '<option value="">— Pilih Member —</option>';
+    members.forEach(m => {
+      sel.innerHTML += `<option value="${m.id}">${m.memberId} — ${m.nama}</option>`;
+    });
+  }
+
+  function openTukarModal(memberId) {
+    currentMemberId = memberId;
+    updateTukarSelect();
+    if (memberId) {
+      document.getElementById('tukar-member-select').value = memberId;
+      showPunchSection(memberId);
+    } else {
+      document.getElementById('punch-section').style.display = 'none';
+    }
+    document.getElementById('game-kembali').value = '';
+    document.getElementById('game-baru').value = '';
+    document.getElementById('modal-tukar').classList.add('open');
+  }
+
+  function showPunchSection(memberId) {
+    const m = members.find(x => x.id == memberId);
+    if (!m) return;
+    const stats = getMemberStats(m);
+    const tukarBulanIni = getTukarThisMonth(m.id);
+    const maxTukar = stats.tukar;
+    const months = getMonthsActive(m);
+    const tier = stats.tier;
+
+    document.getElementById('punch-section').style.display = 'block';
+    document.getElementById('reward-banner').style.display = months === 6 ? 'flex' : 'none';
+
+    for (let i = 1; i <= 2; i++) {
+      const el = document.getElementById('punch' + i);
+      if (i <= tukarBulanIni) { el.classList.add('used'); el.textContent = '✓'; }
+      else if (i <= maxTukar) { el.classList.remove('used'); el.classList.add('available'); el.textContent = '○'; }
+      else { el.classList.remove('used','available'); el.textContent = '✕'; el.style.opacity = '0.3'; }
+    }
+
+    const sisa = Math.max(0, maxTukar - tukarBulanIni);
+    document.getElementById('punch-status').textContent = `Sudah tukar ${tukarBulanIni}x · Sisa ${sisa}x bulan ini (max ${maxTukar}x)`;
+  }
+
+  document.getElementById('tukar-member-select').onchange = function() {
+    const id = parseInt(this.value);
+    if (id) { currentMemberId = id; showPunchSection(id); }
+    else { document.getElementById('punch-section').style.display = 'none'; }
+  };
+
+  function submitTukar() {
+    if (!currentMemberId) { alert('Pilih member dulu!'); return; }
+    const m = members.find(x => x.id == currentMemberId);
+    if (!m) return;
+    const tier = getTier(m);
+    const tukarBulanIni = getTukarThisMonth(m.id);
+
+    if (tier.maxTukar !== 99 && tukarBulanIni >= tier.maxTukar) {
+      alert(`${m.nama} sudah mencapai batas tukar bulan ini (${tier.maxTukar}x). Upgrade tier untuk tukar lebih banyak!`);
+      return;
+    }
+
+    const gameKembali = document.getElementById('game-kembali').value.trim();
+    const gameBaru = document.getElementById('game-baru').value.trim();
+    if (!gameKembali || !gameBaru) { alert('Isi game yang dikembalikan dan game baru!'); return; }
+
+    const totalTukar = tukarLog.filter(t => t.memberId === m.id).length + 1;
+
+    tukarLog.push({
+      id: Date.now(), ts: Date.now(),
+      memberId: m.id, memberNama: m.nama,
+      tgl: new Date().toISOString().split('T')[0],
+      gameKembali, gameBaru, tukarKe: totalTukar
+    });
+
+    localStorage.setItem('rp_tukar', JSON.stringify(tukarLog));
+    closeTukarModal();
+    renderAll();
+    alert(`✅ Tukar game berhasil! ${m.nama} menukar ${gameKembali} → ${gameBaru}`);
+  }
+
+  function closeTukarModal() { document.getElementById('modal-tukar').classList.remove('open'); }
+
+  function openDetailModal(memberId) {
+    const m = members.find(x => x.id === memberId);
+    if (!m) return;
+    currentMemberId = memberId;
+    const tier = getTier(m);
+    const tukarBulanIni = getTukarThisMonth(m.id);
+    const totalTukar = tukarLog.filter(t => t.memberId === m.id).length;
+    const months = getMonthsActive(m);
+
+    document.getElementById('detail-card-wrap').innerHTML = `
+      <div class="member-card-visual ${tier.class}">
+        <div class="card-circle c1"></div><div class="card-circle c2"></div>
+        <div class="card-top">
+          <div class="card-brand">RIVALS PLAY</div>
+          <div class="card-tier-badge">${tier.icon} ${tier.name}</div>
+        </div>
+        <div class="card-chip"></div>
+        <div class="card-bottom">
+          <div class="card-name">${m.nama.toUpperCase()}</div>
+          <div class="card-id">${m.memberId} · ${m.unit}</div>
+          <div class="card-punches">
+            <div class="punch ${tukarBulanIni >= 1 ? 'used' : ''}">${tukarBulanIni >= 1 ? '✓' : '○'}</div>
+            <div class="punch ${tukarBulanIni >= 2 ? 'used' : ''}">${tukarBulanIni >= 2 ? '✓' : '○'}</div>
+            <div class="punch-label">${tukarBulanIni}/${tier.maxTukar > 4 ? '∞' : tier.maxTukar} tukar</div>
+          </div>
+          <div class="card-exp">Bergabung: ${m.mulai} · Bulan ke-${months || 1}</div>
+        </div>
+      </div>`;
+
+    document.getElementById('detail-info').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <div style="display:flex;justify-content:space-between"><span>WA</span><span style="color:var(--green)">${m.wa}</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Game saat ini</span><span style="color:var(--text)">${m.game || '—'}</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Tukar bulan ini</span><span style="color:var(--accent)">${tukarBulanIni}x</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Total tukar</span><span>${totalTukar}x</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Tier saat ini</span><span>${tier.icon} ${tier.name}</span></div>
+      </div>`;
+
+    document.getElementById('modal-detail').classList.add('open');
+  }
+
+  function closeDetailModal() { document.getElementById('modal-detail').classList.remove('open'); }
+
+  function tukarFromDetail() {
+    closeDetailModal();
+    openTukarModal(currentMemberId);
+  }
+
+  // Preview card live update
+  document.getElementById('m-nama').oninput = function() {
+    document.getElementById('preview-name').textContent = this.value.toUpperCase() || 'NAMA MEMBER';
+  };
+  document.getElementById('m-mulai').oninput = function() {
+    document.getElementById('preview-exp').textContent = 'Bergabung: ' + (this.value || '—');
+    document.getElementById('preview-id').textContent = generateId();
+  };
+
+
+  // EARLY ACCESS
+  let eaGames = JSON.parse(localStorage.getItem('rp_eagames') || '[]');
+  let eaRequests = JSON.parse(localStorage.getItem('rp_earequests') || '[]');
+
+  const GENRE_EMOJI = { action: '⚔️', sport: '⚽', adventure: '🗺️', racing: '🏎️' };
+  const GENRE_CLASS = { action: 'type-action', sport: 'type-sport', adventure: 'type-adventure', racing: 'type-racing' };
+
+  function toggleAddGame() {
+    const f = document.getElementById('add-game-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function getEAPhase(tglMasuk) {
+    const diff = Math.floor((Date.now() - new Date(tglMasuk)) / (1000 * 60 * 60 * 24));
+    if (diff <= 2) return { phase: 1, label: 'EXCLUSIVE', days: diff };
+    if (diff <= 6) return { phase: 2, label: 'SILVER+', days: diff };
+    return { phase: 3, label: 'OPEN', days: diff };
+  }
+
+  function canAccess(tierName, phase) {
+    if (phase === 3) return true;
+    if (phase === 2) return ['SILVER','GOLD','PLATINUM'].includes(tierName);
+    if (phase === 1) return ['GOLD','PLATINUM'].includes(tierName);
+    return false;
+  }
+
+  function addEAGame() {
+    const nama = document.getElementById('ea-game-nama').value.trim();
+    const genre = document.getElementById('ea-game-genre').value;
+    const tgl = document.getElementById('ea-game-tgl').value;
+    if (!nama || !tgl) { alert('Nama game dan tanggal wajib diisi!'); return; }
+
+    eaGames.push({ id: Date.now(), nama, genre, tgl });
+    localStorage.setItem('rp_eagames', JSON.stringify(eaGames));
+    document.getElementById('ea-game-nama').value = '';
+    toggleAddGame();
+    renderEAGames();
+  }
+
+  function renderEAGames() {
+    const grid = document.getElementById('ea-game-grid');
+    if (!eaGames.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-size:14px">Belum ada game baru. Tambahkan game baru rilis! 🎮</div>';
+      return;
+    }
+
+    grid.innerHTML = eaGames.sort((a,b) => new Date(b.tgl) - new Date(a.tgl)).map(g => {
+      const phase = getEAPhase(g.tgl);
+      const badgeClass = phase.phase === 1 ? 'live' : phase.phase === 2 ? 'soon' : 'open';
+      const badgeText = phase.phase === 1 ? '🔥 EXCLUSIVE' : phase.phase === 2 ? '⏳ SILVER+' : '✅ OPEN';
+
+      const accessRows = [
+        { tier: 'PLATINUM', icon: '💎', ok: canAccess('PLATINUM', phase.phase) },
+        { tier: 'GOLD', icon: '🥇', ok: canAccess('GOLD', phase.phase) },
+        { tier: 'SILVER', icon: '🥈', ok: canAccess('SILVER', phase.phase) },
+        { tier: 'BRONZE', icon: '🥉', ok: canAccess('BRONZE', phase.phase) },
+      ];
+
+      const alreadyRequested = eaRequests.some(r => r.gameId === g.id);
+
+      return `
+        <div class="game-new-card">
+          <div class="game-new-img ${GENRE_CLASS[g.genre] || 'type-action'}">
+            ${GENRE_EMOJI[g.genre] || '🎮'}
+            <span class="ea-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="game-new-body">
+            <div class="game-new-title">${g.nama}</div>
+            <div class="game-new-meta">Masuk: ${g.tgl} · Hari ke-${phase.days + 1}</div>
+            <div class="access-row">
+              ${accessRows.map(a => `
+                <span class="access-chip ${a.ok ? (phase.phase === 1 && ['GOLD','PLATINUM'].includes(a.tier) ? 'highlight' : 'yes') : 'wait'}">
+                  ${a.icon} ${a.ok ? '✓' : '⏳'}
+                </span>`).join('')}
+            </div>
+            <button class="request-btn ${alreadyRequested ? 'waiting' : 'active'}"
+              onclick="${alreadyRequested ? '' : 'requestEA(' + g.id + ')'}"
+              ${alreadyRequested ? 'disabled' : ''}>
+              ${alreadyRequested ? '✓ Sudah Direquest' : '🎮 Request Early Access'}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function requestEA(gameId) {
+    const game = eaGames.find(g => g.id === gameId);
+    if (!game) return;
+
+    if (!members.length) { alert('Belum ada member terdaftar!'); return; }
+
+    const memberOptions = members.map(m => `${m.memberId} — ${m.nama} (${getTier(m).name})`).join('\n');
+    const input = prompt('Pilih nomor member:\n' + members.map((m,i) => `${i+1}. ${m.memberId} — ${m.nama} (${getTier(m).name})`).join('\n'));
+    if (!input) return;
+
+    const idx = parseInt(input) - 1;
+    const member = members[idx];
+    if (!member) { alert('Member tidak valid!'); return; }
+
+    const tier = getTier(member);
+    const phase = getEAPhase(game.tgl);
+
+    if (!canAccess(tier.name, phase.phase)) {
+      alert(`${member.nama} (${tier.name}) belum bisa akses game ini.\n\nGame ini masih dalam fase ${phase.phase === 1 ? 'Gold & Platinum only' : 'Silver ke atas'}.\nCoba lagi hari ke-${phase.phase === 1 ? '4' : '8'}.`);
+      return;
+    }
+
+    eaRequests.push({
+      id: Date.now(),
+      gameId, gameName: game.nama,
+      memberId: member.id, memberNama: member.nama,
+      tier: tier.name,
+      tgl: new Date().toISOString().split('T')[0],
+      status: 'approved'
+    });
+
+    localStorage.setItem('rp_earequests', JSON.stringify(eaRequests));
+    renderEAGames();
+    renderEARequests();
+    alert(`✅ ${member.nama} dapat akses early access ${game.nama}!`);
+  }
+
+  function renderEARequests() {
+    const tbody = document.getElementById('req-tbody');
+    const sorted = [...eaRequests].sort((a,b) => b.id - a.id);
+    if (!sorted.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Belum ada request.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = sorted.map(r => {
+      const tierColors = { BRONZE: '#8d6e63', SILVER: '#C0C0C0', GOLD: '#FFD700', PLATINUM: '#e040fb' };
+      return `
+        <tr>
+          <td style="font-size:12px;color:var(--muted);font-family:var(--mono)">${r.tgl}</td>
+          <td style="font-weight:600">${r.memberNama}</td>
+          <td style="color:${tierColors[r.tier] || 'var(--muted)'}; font-weight:700; font-size:12px">${r.tier}</td>
+          <td style="font-weight:600">${r.gameName}</td>
+          <td><span style="background:var(--green-dim);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">✓ Approved</span></td>
+        </tr>`;
+    }).join('');
+  }
+
+  const origSwitchTab = switchTab;
+  switchTab = function(name) {
+    origSwitchTab(name);
+    if (name === 'earlyaccess') {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('ea-game-tgl').value = today;
+      renderEAGames();
+      renderEARequests();
+    }
+  };
+
+  // Init EA
+  const eaTgl = document.getElementById('ea-game-tgl');
+  if (eaTgl) eaTgl.value = new Date().toISOString().split('T')[0];
+
+  // INIT
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('m-mulai').value = today;
+  document.getElementById('preview-id').textContent = generateId();
+  renderAll();
+
+
+  // =================== DENDA ===================
+  let dendaLog = JSON.parse(localStorage.getItem('rp_denda') || '[]');
+
+  const DENDA_RANGE = { A: [0,0], B: [25000,50000], C: [50000,150000], D: [0,0] };
+  const ITEM_LABEL = { konsol:'Konsol PS5', controller:'Controller', monitor:'Monitor', game:'Game Fisik', kabel:'Kabel/Aksesoris' };
+  const CAT_COLOR = { A:'var(--green)', B:'var(--yellow)', C:'var(--orange)', D:'var(--red)' };
+
+  function updateDendaSelect() {
+    const sel = document.getElementById('denda-member');
+    sel.innerHTML = '<option value="">— Pilih Member —</option>';
+    members.forEach(m => {
+      const tier = getTier(m);
+      sel.innerHTML += `<option value="${m.id}">${m.memberId} — ${m.nama} (${tier.name})</option>`;
+    });
+  }
+
+  function onDendaMemberChange() { calcDenda(); }
+
+  function calcDenda() {
+    const memberId = parseInt(document.getElementById('denda-member').value);
+    const kat = document.getElementById('denda-kategori').value;
+    const nominal = parseInt(document.getElementById('denda-nominal').value) || 0;
+    const lapor = document.getElementById('denda-lapor').value;
+    const item = document.getElementById('denda-item').value;
+    const member = members.find(m => m.id === memberId);
+
+    if (!memberId || !nominal) {
+      document.getElementById('denda-preview').classList.remove('show');
+      document.getElementById('denda-konfirm-btn').classList.remove('show');
+      return;
+    }
+
+    const tier = member ? getTier(member) : null;
+    const isPlatCatB = tier && tier.name === 'PLATINUM' && kat === 'B';
+    const isLapor = lapor === 'ya';
+    const diskon = isLapor ? Math.round(nominal * 0.2) : 0;
+    const total = isPlatCatB ? 0 : Math.max(0, nominal - diskon);
+
+    document.getElementById('prev-denda-member').textContent = member ? member.nama : '—';
+    document.getElementById('prev-denda-item').textContent = ITEM_LABEL[item] || item;
+    document.getElementById('prev-denda-kat').textContent = 'Kategori ' + kat;
+    document.getElementById('prev-denda-nominal').textContent = 'Rp ' + nominal.toLocaleString('id-ID');
+    document.getElementById('prev-denda-diskon').textContent = '-Rp ' + diskon.toLocaleString('id-ID');
+    document.getElementById('prev-denda-total').textContent = total === 0 ? 'Rp 0 (Dibebaskan)' : 'Rp ' + total.toLocaleString('id-ID');
+
+    document.getElementById('prev-discount-row').style.display = isLapor && !isPlatCatB ? 'flex' : 'none';
+    document.getElementById('prev-plat-row').style.display = isPlatCatB ? 'flex' : 'none';
+
+    document.getElementById('denda-preview').classList.add('show');
+    document.getElementById('denda-konfirm-btn').classList.add('show');
+  }
+
+  function submitDenda() {
+    const memberId = parseInt(document.getElementById('denda-member').value);
+    const kat = document.getElementById('denda-kategori').value;
+    const nominal = parseInt(document.getElementById('denda-nominal').value) || 0;
+    const lapor = document.getElementById('denda-lapor').value;
+    const item = document.getElementById('denda-item').value;
+    const desc = document.getElementById('denda-desc').value.trim();
+    const status = document.getElementById('denda-status').value;
+    const member = members.find(m => m.id === memberId);
+
+    if (!member || !nominal) { alert('Lengkapi data denda!'); return; }
+
+    const tier = getTier(member);
+    const isPlatCatB = tier.name === 'PLATINUM' && kat === 'B';
+    const diskon = lapor === 'ya' ? Math.round(nominal * 0.2) : 0;
+    const total = isPlatCatB ? 0 : Math.max(0, nominal - diskon);
+
+    dendaLog.push({
+      id: Date.now(),
+      tgl: new Date().toISOString().split('T')[0],
+      memberId: member.id,
+      memberNama: member.nama,
+      memberTier: tier.name,
+      item, kat, nominal, diskon, total,
+      desc, lapor, status: isPlatCatB ? 'bebas' : status
+    });
+
+    localStorage.setItem('rp_denda', JSON.stringify(dendaLog));
+    renderDendaLog();
+
+    // Reset form
+    document.getElementById('denda-member').value = '';
+    document.getElementById('denda-nominal').value = '';
+    document.getElementById('denda-desc').value = '';
+    document.getElementById('denda-preview').classList.remove('show');
+    document.getElementById('denda-konfirm-btn').classList.remove('show');
+
+    const msg = isPlatCatB
+      ? '✅ Denda dibebaskan untuk member Platinum (Kategori B)!'
+      : `✅ Denda Rp ${total.toLocaleString('id-ID')} untuk ${member.nama} berhasil dicatat!`;
+    alert(msg);
+  }
+
+  function markDendaLunas(id) {
+    const d = dendaLog.find(x => x.id === id);
+    if (!d) return;
+    if (!confirm('Tandai denda ini sebagai lunas?')) return;
+    d.status = 'lunas';
+    localStorage.setItem('rp_denda', JSON.stringify(dendaLog));
+    renderDendaLog();
+  }
+
+  function renderDendaLog() {
+    const tbody = document.getElementById('denda-tbody');
+    const sorted = [...dendaLog].sort((a,b) => b.id - a.id);
+
+    if (!sorted.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Belum ada catatan denda.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = sorted.map(d => {
+      const statusHtml = {
+        lunas: '<span class="status-lunas">✓ Lunas</span>',
+        pending: '<span class="status-pending">⏳ Pending</span>',
+        banding: '<span class="status-banding">⚖️ Banding</span>',
+        bebas: '<span class="status-bebas">✓ Dibebaskan</span>'
+      }[d.status] || '';
+
+      const catHtml = {
+        A: '<span class="cat-pill cat-pill-a">A — Wajar</span>',
+        B: '<span class="cat-pill cat-pill-b">B — Ringan</span>',
+        C: '<span class="cat-pill cat-pill-c">C — Sedang</span>',
+        D: '<span class="cat-pill cat-pill-d">D — Berat</span>'
+      }[d.kat] || '';
+
+      return `
+        <tr>
+          <td style="font-size:11px;color:var(--muted);font-family:var(--mono)">${d.tgl}</td>
+          <td>
+            <div style="font-weight:600">${d.memberNama}</div>
+            <div style="font-size:10px;color:var(--muted)">${d.memberTier}${d.lapor === 'ya' ? ' · Lapor sendiri ✓' : ''}</div>
+          </td>
+          <td style="font-size:12px">${ITEM_LABEL[d.item] || d.item}</td>
+          <td>${catHtml}</td>
+          <td>
+            <div style="font-family:var(--mono);font-weight:700;color:var(--red)">${d.total === 0 ? 'Rp 0' : 'Rp ' + d.total.toLocaleString('id-ID')}</div>
+            ${d.diskon > 0 ? '<div style="font-size:10px;color:var(--green)">-Rp ' + d.diskon.toLocaleString('id-ID') + ' (lapor)</div>' : ''}
+          </td>
+          <td>${statusHtml}</td>
+          <td>${d.status === 'pending' ? '<button onclick="markDendaLunas(' + d.id + ')" style="padding:5px 10px;background:var(--green-dim);border:1px solid var(--green);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--green);font-family:var(--font)">Lunas</button>' : ''}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // Override switchTab
+  const _origSwitch3 = switchTab;
+  switchTab = function(name) {
+    _origSwitch3(name);
+    if (name === 'denda') {
+      updateDendaSelect();
+      renderDendaLog();
+    }
+  };
+
+
+  // =================== INVENTARIS ===================
+  let gameInv = JSON.parse(localStorage.getItem('rp_gameinv') || '[]');
+
+  const GENRE_EMO = { sport:'⚽', action:'⚔️', adventure:'🗺️', racing:'🏎️', rpg:'🧙', horror:'👻', other:'🎮' };
+
+  function addGameInv() {
+    const nama = document.getElementById('inv-nama').value.trim();
+    const genre = document.getElementById('inv-genre').value;
+    const copies = parseInt(document.getElementById('inv-copy').value) || 1;
+    const harga = parseInt(document.getElementById('inv-harga').value) || 0;
+
+    if (!nama) { alert('Nama game wajib diisi!'); return; }
+
+    // Check if game already exists
+    const existing = gameInv.find(g => g.nama.toLowerCase() === nama.toLowerCase());
+    if (existing) {
+      // Add copies to existing
+      for (let i = 0; i < copies; i++) {
+        existing.copies.push({ id: Date.now() + i, status: 'available', memberId: null, memberNama: null });
+      }
+    } else {
+      const copyArr = [];
+      for (let i = 0; i < copies; i++) {
+        copyArr.push({ id: Date.now() + i, status: 'available', memberId: null, memberNama: null });
+      }
+      gameInv.push({ id: Date.now(), nama, genre, harga, copies: copyArr });
+    }
+
+    localStorage.setItem('rp_gameinv', JSON.stringify(gameInv));
+    document.getElementById('inv-nama').value = '';
+    renderInventaris();
+  }
+
+  function checkoutGame(gameId, memberNama) {
+    // Mark one copy as out
+    const game = gameInv.find(g => g.id === gameId);
+    if (!game) return false;
+    const avail = game.copies.find(c => c.status === 'available');
+    if (!avail) return false;
+    avail.status = 'out';
+    avail.memberNama = memberNama;
+    localStorage.setItem('rp_gameinv', JSON.stringify(gameInv));
+    return true;
+  }
+
+  function returnGame(gameId) {
+    // Mark one copy as available
+    const game = gameInv.find(g => g.id === gameId);
+    if (!game) return;
+    const out = game.copies.find(c => c.status === 'out');
+    if (out) { out.status = 'available'; out.memberNama = null; }
+    localStorage.setItem('rp_gameinv', JSON.stringify(gameInv));
+  }
+
+  function getAvailCount(game) { return game.copies.filter(c => c.status === 'available').length; }
+  function getOutCount(game) { return game.copies.filter(c => c.status === 'out').length; }
+
+  function renderInventaris() {
+    const rack = document.getElementById('game-rack');
+    const totalJudul = gameInv.length;
+    const totalCopy = gameInv.reduce((s,g) => s + g.copies.length, 0);
+    const totalOut = gameInv.reduce((s,g) => s + getOutCount(g), 0);
+    const totalHabis = gameInv.filter(g => getAvailCount(g) === 0).length;
+
+    document.getElementById('inv-total-judul').textContent = totalJudul;
+    document.getElementById('inv-total-copy').textContent = totalCopy;
+    document.getElementById('inv-dipinjam').textContent = totalOut;
+    document.getElementById('inv-habis').textContent = totalHabis;
+
+    // Alert
+    const alert = document.getElementById('inv-alert');
+    const emptyGames = gameInv.filter(g => getAvailCount(g) === 0);
+    if (emptyGames.length) {
+      alert.classList.add('show');
+      document.getElementById('inv-alert-text').textContent =
+        'Stok habis: ' + emptyGames.map(g => g.nama).join(', ') + ' — semua copy lagi dipinjam member!';
+    } else {
+      alert.classList.remove('show');
+    }
+
+    if (!gameInv.length) {
+      rack.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-size:14px">Belum ada game di inventaris. Tambahkan game dulu!</div>';
+      return;
+    }
+
+    rack.innerHTML = gameInv.map(g => {
+      const avail = getAvailCount(g);
+      const total = g.copies.length;
+      const pct = Math.round((avail / total) * 100);
+      const statusClass = avail === 0 ? 'empty' : avail < total ? 'partial' : 'available';
+      const barClass = avail === 0 ? 'empty' : avail < total ? 'partial' : 'full';
+
+      const copyItems = g.copies.map((c, i) => `
+        <div class="copy-item">
+          <div class="copy-status">
+            <div class="copy-dot ${c.status === 'available' ? 'av' : 'out'}"></div>
+            Copy ${i+1}
+          </div>
+          <div class="copy-member">
+            ${c.status === 'available' ? '<span style="color:var(--green)">Tersedia</span>' : '<span style="color:var(--red)">📤 ' + (c.memberNama || 'Dipinjam') + '</span>'}
+          </div>
+        </div>`).join('');
+
+      return `
+        <div class="game-rack-card ${statusClass}">
+          <div class="game-rack-emoji">${GENRE_EMO[g.genre] || '🎮'}</div>
+          <div class="game-rack-title">${g.nama}</div>
+          <div class="game-rack-genre">${g.genre.toUpperCase()}${g.harga ? ' · Rp ' + g.harga + 'rb' : ''}</div>
+          <div class="stock-bar-wrap">
+            <div class="stock-bar-track">
+              <div class="stock-bar-fill ${barClass}" style="width:${avail === 0 ? 100 : pct}%"></div>
+            </div>
+            <div class="stock-numbers">
+              <span>${avail} tersedia</span>
+              <span>${getOutCount(g)} dipinjam</span>
+              <span>${total} total</span>
+            </div>
+          </div>
+          <div class="copy-list">${copyItems}</div>
+          <div style="display:flex;gap:6px">
+            <button onclick="quickCheckout(${g.id})" style="flex:1;padding:7px;background:var(--red-dim);border:1px solid var(--red);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;color:var(--red);font-family:var(--font)" ${avail === 0 ? 'disabled style="opacity:0.4;cursor:default"' : ''}>📤 Keluar</button>
+            <button onclick="quickReturn(${g.id})" style="flex:1;padding:7px;background:var(--green-dim);border:1px solid var(--green);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;color:var(--green);font-family:var(--font)" ${getOutCount(g) === 0 ? 'disabled style="opacity:0.4;cursor:default"' : ''}>📥 Kembali</button>
+            <button onclick="deleteGame(${g.id})" style="padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:11px;cursor:pointer;color:var(--muted);font-family:var(--font)">🗑</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function quickCheckout(gameId) {
+    const game = gameInv.find(g => g.id === gameId);
+    if (!game) return;
+    const nama = prompt('Nama member yang ambil game "' + game.nama + '":');
+    if (!nama) return;
+    if (checkoutGame(gameId, nama)) {
+      renderInventaris();
+    } else {
+      alert('Stok ' + game.nama + ' habis!');
+    }
+  }
+
+  function quickReturn(gameId) {
+    const game = gameInv.find(g => g.id === gameId);
+    if (!game) return;
+    if (confirm('Kembalikan satu copy "' + game.nama + '" ke rak?')) {
+      returnGame(gameId);
+      renderInventaris();
+    }
+  }
+
+  function deleteGame(gameId) {
+    const game = gameInv.find(g => g.id === gameId);
+    if (!game) return;
+    if (!confirm('Hapus "' + game.nama + '" dari inventaris?')) return;
+    gameInv = gameInv.filter(g => g.id !== gameId);
+    localStorage.setItem('rp_gameinv', JSON.stringify(gameInv));
+    renderInventaris();
+  }
+
+  // Override switchTab to render inventaris
+  const _origSwitch2 = switchTab;
+  switchTab = function(name) {
+    _origSwitch2(name);
+    if (name === 'inventaris') renderInventaris();
+  };
+
+</script>
+</body>
+</html>
