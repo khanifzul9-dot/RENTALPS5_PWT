@@ -867,10 +867,12 @@
     <div class="logo-icon">🎮</div>
     Rental <span>PS5</span> PWK
   </div>
-  <div class="header-stats">
-    <div class="stat-pill"><div class="dot green"></div> 3 Tersedia</div>
-    <div class="stat-pill"><div class="dot yellow"></div> 1 Disewa</div>
-    <div class="stat-pill"><div class="dot red"></div> 1 Servis</div>
+  <div class="header-stats" id="header-stats">
+    <div class="stat-pill"><div class="dot green"></div> <span id="h-tersedia">3</span> Tersedia</div>
+    <div class="stat-pill"><div class="dot yellow"></div> <span id="h-disewa">1</span> Disewa</div>
+    <div class="stat-pill" id="h-pending-pill" style="display:none;border-color:var(--yellow);background:var(--yellow-dim)">
+      <div class="dot yellow"></div> <span id="h-pending">0</span> Pending
+    </div>
   </div>
 </header>
 
@@ -1187,61 +1189,19 @@
 
   <!-- RIWAYAT -->
   <div class="panel" id="panel-riwayat">
-    <div class="section-title">Booking Aktif & Riwayat</div>
-    <div class="booking-list">
 
-      <div class="booking-card">
-        <div class="booking-id">#BK028</div>
-        <div>
-          <div class="booking-name">Reza Aditya</div>
-          <div class="booking-meta">UNIT-04 · 28–30 Jun · Antar: Kranji PWK</div>
-        </div>
-        <span class="badge aktif">Aktif</span>
-        <div>
-          <div class="booking-amount">Rp 470.000</div>
-          <div class="booking-days">2 hari</div>
-        </div>
+    <!-- FILTER TABS -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="filter-riwayat active" id="fr-all" onclick="filterRiwayat('all')" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);font-family:var(--font)">Semua</button>
+      <button class="filter-riwayat" id="fr-pending" onclick="filterRiwayat('pending')" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font)">⏳ Pending</button>
+      <button class="filter-riwayat" id="fr-aktif" onclick="filterRiwayat('aktif')" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font)">🟢 Aktif</button>
+      <button class="filter-riwayat" id="fr-selesai" onclick="filterRiwayat('selesai')" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--font)">✓ Selesai</button>
+    </div>
+
+    <div class="booking-list" id="booking-list-container">
+      <div style="text-align:center;color:var(--muted);padding:40px;font-size:14px">
+        Belum ada booking masuk.
       </div>
-
-      <div class="booking-card">
-        <div class="booking-id">#BK027</div>
-        <div>
-          <div class="booking-name">Dina Safitri</div>
-          <div class="booking-meta">UNIT-02 · 25–28 Jun · Antar: Grendeng</div>
-        </div>
-        <span class="badge selesai">Selesai</span>
-        <div>
-          <div class="booking-amount">Rp 670.000</div>
-          <div class="booking-days">3 hari</div>
-        </div>
-      </div>
-
-      <div class="booking-card">
-        <div class="booking-id">#BK026</div>
-        <div>
-          <div class="booking-name">Bagas Pratama</div>
-          <div class="booking-meta">UNIT-01 · 22–29 Jun · Antar: Unsoed</div>
-        </div>
-        <span class="badge selesai">Selesai</span>
-        <div>
-          <div class="booking-amount">Rp 870.000</div>
-          <div class="booking-days">7 hari</div>
-        </div>
-      </div>
-
-      <div class="booking-card">
-        <div class="booking-id">#BK025</div>
-        <div>
-          <div class="booking-name">Irfan Maulana</div>
-          <div class="booking-meta">UNIT-03 · 20–21 Jun · Antar: Berkoh</div>
-        </div>
-        <span class="badge selesai">Selesai</span>
-        <div>
-          <div class="booking-amount">Rp 670.000</div>
-          <div class="booking-days">1 hari</div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -1586,6 +1546,175 @@ _Rental PS5 PWK_`;
     if (!nama) { alert('Masukkan nama penyewa dulu!'); return; }
     closeModal();
     switchTab('booking');
+  }
+
+  // =================== BOOKING MANAGEMENT ===================
+  let currentFilter = 'all';
+
+  function getBookings() {
+    try { return JSON.parse(localStorage.getItem('rp_bookings') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveBookings(bookings) {
+    localStorage.setItem('rp_bookings', JSON.stringify(bookings));
+  }
+
+  function filterRiwayat(filter) {
+    currentFilter = filter;
+    // Update filter buttons
+    document.querySelectorAll('.filter-riwayat').forEach(btn => {
+      btn.style.borderColor = 'var(--border)';
+      btn.style.background = 'var(--surface2)';
+      btn.style.color = 'var(--muted)';
+    });
+    const active = document.getElementById('fr-' + filter);
+    if (active) {
+      active.style.borderColor = 'var(--accent)';
+      active.style.background = 'var(--accent-dim)';
+      active.style.color = 'var(--accent)';
+    }
+    renderBookingList();
+  }
+
+  function renderBookingList() {
+    const bookings = getBookings();
+    const container = document.getElementById('booking-list-container');
+    if (!container) return;
+
+    let filtered = [...bookings].sort((a,b) => b.ts - a.ts);
+    if (currentFilter !== 'all') {
+      filtered = filtered.filter(b => b.status === currentFilter);
+    }
+
+    if (!filtered.length) {
+      container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;font-size:14px">Belum ada booking ' + (currentFilter !== 'all' ? currentFilter : '') + '.</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(b => {
+      const statusBadge = {
+        pending: '<span class="badge pending">⏳ Pending</span>',
+        aktif: '<span class="badge aktif">🟢 Aktif</span>',
+        selesai: '<span class="badge selesai">✓ Selesai</span>',
+        rejected: '<span class="badge" style="background:var(--red-dim);color:var(--red)">✗ Ditolak</span>'
+      }[b.status] || '';
+
+      const actions = b.status === 'pending' ? `
+        <div style="display:flex;gap:6px;margin-top:10px;grid-column:1/-1">
+          <button onclick="approveBooking('${b.bookingId}')" style="flex:1;padding:8px;background:var(--green-dim);border:1px solid var(--green);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--green);font-family:var(--font)">✓ Approve</button>
+          <button onclick="rejectBooking('${b.bookingId}')" style="flex:1;padding:8px;background:var(--red-dim);border:1px solid var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--red);font-family:var(--font)">✗ Tolak</button>
+          <button onclick="contactCustomer('${b.wa}')" style="flex:1;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text);font-family:var(--font)">💬 WA</button>
+        </div>` :
+      b.status === 'aktif' ? `
+        <div style="display:flex;gap:6px;margin-top:10px;grid-column:1/-1">
+          <button onclick="completeBooking('${b.bookingId}')" style="flex:1;padding:8px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--accent);font-family:var(--font)">✓ Selesai & Unit Kembali</button>
+          <button onclick="contactCustomer('${b.wa}')" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font);color:var(--text)">💬</button>
+        </div>` : '';
+
+      return `
+        <div class="booking-card" style="display:block;padding:16px">
+          <div style="display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start">
+            <div class="booking-id">${b.bookingId}</div>
+            <div>
+              <div class="booking-name">${b.nama}</div>
+              <div class="booking-meta">${b.unit} · ${b.tglMulai} → ${b.tglKembali} · ${b.durasi}</div>
+              <div class="booking-meta">📍 ${b.alamat || '—'}</div>
+              <div class="booking-meta">📱 ${b.wa} · 🆘 ${b.kontak || '—'}</div>
+              <div class="booking-meta">📦 ${b.paketLabel || b.paket}</div>
+            </div>
+            <div style="text-align:right">
+              ${statusBadge}
+              <div class="booking-amount" style="margin-top:6px">${b.totalStr}</div>
+              <div class="booking-days">${b.tglBooking || '—'}</div>
+            </div>
+          </div>
+          ${actions}
+        </div>`;
+    }).join('');
+  }
+
+  function approveBooking(bookingId) {
+    const bookings = getBookings();
+    const b = bookings.find(x => x.bookingId === bookingId);
+    if (!b) return;
+    if (!confirm('Approve booking ' + bookingId + ' — ' + b.nama + '?')) return;
+
+    b.status = 'aktif';
+    saveBookings(bookings);
+
+    // Update unit status
+    updateUnitStatus(b.unit, 'rented', b.nama, b.tglKembali);
+    renderBookingList();
+
+    // Send WA confirmation to customer
+    const msg =
+`✅ *BOOKING DIKONFIRMASI — RIVALS PLAY*
+━━━━━━━━━━━━━━━━
+📋 ID: ${b.bookingId}
+👤 ${b.nama}
+🎮 ${b.unit} · ${b.paketLabel}
+📅 ${b.tglMulai} → ${b.tglKembali}
+💰 Total: ${b.totalStr}
+━━━━━━━━━━━━━━━━
+✅ Deposit diterima. Unit akan diantar ke alamat kamu.
+Kami akan hubungi kamu 1 jam sebelum pengiriman.
+
+Terima kasih! 🎮
+_Rivals Play Purwokerto_`;
+
+    contactCustomerMsg(b.wa, msg);
+    alert('✅ Booking ' + bookingId + ' diapprove! Notifikasi dikirim ke ' + b.nama);
+  }
+
+  function rejectBooking(bookingId) {
+    const bookings = getBookings();
+    const b = bookings.find(x => x.bookingId === bookingId);
+    if (!b) return;
+    const alasan = prompt('Alasan penolakan (opsional):') || 'Unit tidak tersedia';
+    if (!confirm('Tolak booking ' + bookingId + '?')) return;
+
+    b.status = 'rejected';
+    saveBookings(bookings);
+    renderBookingList();
+
+    const msg =
+`❌ *BOOKING TIDAK DAPAT DIPROSES — RIVALS PLAY*
+📋 ID: ${b.bookingId}
+Alasan: ${alasan}
+
+Mohon maaf atas ketidaknyamanannya. Silakan booking ulang di tanggal lain atau hubungi kami via WA untuk bantuan lebih lanjut.
+_Rivals Play Purwokerto_`;
+
+    contactCustomerMsg(b.wa, msg);
+    alert('Booking ' + bookingId + ' ditolak.');
+  }
+
+  function completeBooking(bookingId) {
+    const bookings = getBookings();
+    const b = bookings.find(x => x.bookingId === bookingId);
+    if (!b) return;
+    if (!confirm('Tandai booking ' + bookingId + ' selesai & unit kembali?')) return;
+
+    b.status = 'selesai';
+    saveBookings(bookings);
+
+    // Unit back to available
+    updateUnitStatus(b.unit, 'available');
+    renderBookingList();
+    alert('✅ Booking selesai. Unit ' + b.unit + ' kembali tersedia.');
+  }
+
+  function contactCustomer(wa) {
+    const num = wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum, '_blank');
+  }
+
+  function contactCustomerMsg(wa, msg) {
+    const num = wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg), '_blank');
   }
 
   const today = new Date().toISOString().split('T')[0];

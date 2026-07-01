@@ -346,6 +346,83 @@
     .kpi-row { grid-template-columns: 1fr 1fr; }
     .module-grid { grid-template-columns: 1fr; }
   }
+
+  /* NOTIF BADGE */
+  .notif-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg);
+    animation: pulse-badge 1.5s infinite;
+  }
+
+  .notif-badge.show { display: flex; }
+
+  @keyframes pulse-badge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  /* PENDING WIDGET */
+  .pending-widget {
+    background: var(--surface);
+    border: 1px solid var(--yellow);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .pending-widget.show { display: block; }
+
+  .pending-widget-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--yellow);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pending-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .pending-item:last-child { margin-bottom: 0; }
+  .pending-item-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .pending-item-meta { font-size: 11px; color: var(--muted); }
+  .pending-item-actions { display: flex; gap: 6px; }
+
+  .p-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+  }
+
+  .p-btn-approve { background: var(--green); color: #000; }
+  .p-btn-reject { background: var(--red-dim); border: 1px solid var(--red) !important; color: var(--red); background: transparent; }
+  .p-btn-wa { background: var(--surface); border: 1px solid var(--border) !important; color: var(--text); background: transparent; }
 </style>
 </head>
 <body>
@@ -454,6 +531,17 @@
         </div>
 
         <!-- UNIT STATUS -->
+        <!-- PENDING BOOKING WIDGET -->
+        <div class="pending-widget" id="pending-widget">
+          <div class="pending-widget-title">
+            ⏳ <span id="pending-widget-title">Booking Menunggu Konfirmasi</span>
+          </div>
+          <div id="pending-list"></div>
+          <button onclick="showPage('booking')" style="width:100%;margin-top:10px;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);font-family:var(--font)">
+            Lihat Semua di Modul Booking →
+          </button>
+        </div>
+
         <div class="section-title">Status Unit</div>
         <div class="unit-row">
           <div class="unit-pill av">
@@ -510,7 +598,8 @@
         <div class="section-title">Modul Sistem</div>
         <div class="module-grid">
 
-          <div class="module-card m1" onclick="showPage('booking')">
+          <div class="module-card m1" onclick="showPage('booking')" style="position:relative">
+            <div class="notif-badge" id="booking-notif-badge">0</div>
             <div class="module-header">
               <div class="module-icon">📋</div>
               <div class="module-arrow">→</div>
@@ -670,6 +759,116 @@
       }
     });
   } catch(e) {}
+
+  // =================== PENDING BOOKINGS ===================
+  function getBookings() {
+    try { return JSON.parse(localStorage.getItem('rp_bookings') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveBookings(b) {
+    localStorage.setItem('rp_bookings', JSON.stringify(b));
+  }
+
+  function updateUnitStatusDash(unitId, status, penyewa, kembali) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('rp_unit_status') || '{}');
+      saved[unitId] = { status, penyewa: penyewa || null, kembali: kembali || null };
+      localStorage.setItem('rp_unit_status', JSON.stringify(saved));
+    } catch(e) {}
+  }
+
+  function renderPendingWidget() {
+    const bookings = getBookings();
+    const pending = bookings.filter(b => b.status === 'pending');
+    const widget = document.getElementById('pending-widget');
+    const list = document.getElementById('pending-list');
+    const badge = document.getElementById('booking-notif-badge');
+    const title = document.getElementById('pending-widget-title');
+
+    // Update badge
+    if (badge) {
+      badge.textContent = pending.length;
+      badge.classList.toggle('show', pending.length > 0);
+    }
+
+    // Update KPI jadwal
+    try {
+      const jadwal = JSON.parse(localStorage.getItem('ps5_jadwal') || '[]');
+      const todayCount = jadwal.filter(j => j.tgl === new Date().toISOString().split('T')[0]).length;
+      const kpiJadwal = document.getElementById('kpi-jadwal');
+      if (kpiJadwal) kpiJadwal.textContent = todayCount;
+    } catch(e) {}
+
+    if (!pending.length) {
+      widget.classList.remove('show');
+      return;
+    }
+
+    widget.classList.add('show');
+    if (title) title.textContent = pending.length + ' Booking Menunggu Konfirmasi';
+
+    list.innerHTML = pending.slice(0, 3).map(b => `
+      <div class="pending-item">
+        <div>
+          <div class="pending-item-name">${b.nama}</div>
+          <div class="pending-item-meta">${b.unit} · ${b.paketLabel || b.paket} · ${b.tglMulai} → ${b.tglKembali}</div>
+          <div class="pending-item-meta">📱 ${b.wa} · 💰 ${b.totalStr}</div>
+        </div>
+        <div class="pending-item-actions">
+          <button class="p-btn p-btn-approve" onclick="dashApprove('${b.bookingId}')">✓</button>
+          <button class="p-btn p-btn-wa" onclick="dashWA('${b.wa}')">💬</button>
+        </div>
+      </div>`).join('');
+
+    if (pending.length > 3) {
+      list.innerHTML += `<div style="text-align:center;font-size:12px;color:var(--muted);padding:8px">+${pending.length - 3} booking lainnya</div>`;
+    }
+  }
+
+  function dashApprove(bookingId) {
+    const bookings = getBookings();
+    const b = bookings.find(x => x.bookingId === bookingId);
+    if (!b) return;
+    if (!confirm('Approve booking ' + bookingId + ' — ' + b.nama + '?')) return;
+
+    b.status = 'aktif';
+    saveBookings(bookings);
+    updateUnitStatusDash(b.unit, 'rented', b.nama, b.tglKembali);
+
+    // WA konfirmasi ke customer
+    const msg =
+`✅ *BOOKING DIKONFIRMASI — RIVALS PLAY*
+━━━━━━━━━━━━━━━━
+📋 ID: ${b.bookingId}
+👤 ${b.nama}
+🎮 ${b.unit} · ${b.paketLabel || b.paket}
+📅 ${b.tglMulai} → ${b.tglKembali}
+💰 Total: ${b.totalStr}
+━━━━━━━━━━━━━━━━
+✅ Deposit diterima. Unit akan segera diantar!
+Kami hubungi 1 jam sebelum pengiriman.
+
+Terima kasih! 🎮
+_Rivals Play Purwokerto_`;
+
+    const num = b.wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg), '_blank');
+
+    renderPendingWidget();
+    alert('✅ ' + b.nama + ' diapprove! WA konfirmasi terkirim.');
+  }
+
+  function dashWA(wa) {
+    const num = wa.replace(/[^0-9]/g,'');
+    const waNum = num.startsWith('0') ? '62' + num.slice(1) : num;
+    window.open('https://wa.me/' + waNum, '_blank');
+  }
+
+  // Init & auto refresh
+  renderPendingWidget();
+  setInterval(renderPendingWidget, 5000);
 </script>
 </body>
 </html>

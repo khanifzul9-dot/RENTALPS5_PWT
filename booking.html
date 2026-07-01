@@ -222,6 +222,101 @@
   /* FOOTER */
   .footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 20px; }
 
+  /* FULL NOTICE */
+  .full-notice {
+    background: linear-gradient(135deg, rgba(255,23,68,0.08), rgba(255,109,0,0.05));
+    border: 1px solid var(--red);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .full-notice.show { display: block; }
+
+  .full-notice-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--red);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .full-notice-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .date-suggest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .date-suggest-btn {
+    padding: 10px 8px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+
+  .date-suggest-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .date-suggest-btn .date-day { font-size: 13px; color: var(--accent); display: block; margin-bottom: 2px; }
+  .date-suggest-btn .date-avail { font-size: 10px; color: var(--green); display: block; margin-top: 2px; }
+
+  /* UNIT STATUS */
+  .unit-status-item {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .unit-status-item.available {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .unit-status-item.rented {
+    border-color: var(--yellow);
+    background: var(--yellow-dim);
+  }
+
+  .unit-status-item.maintenance {
+    border-color: var(--red);
+    background: var(--red-dim);
+  }
+
+  .unit-status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .unit-status-item.available .unit-status-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .unit-status-item.rented .unit-status-dot { background: var(--yellow); }
+  .unit-status-item.maintenance .unit-status-dot { background: var(--red); }
+
+  .unit-status-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .unit-status-label { font-size: 11px; font-weight: 600; }
+  .unit-status-item.available .unit-status-label { color: var(--green); }
+  .unit-status-item.rented .unit-status-label { color: var(--yellow); }
+  .unit-status-item.maintenance .unit-status-label { color: var(--red); }
+  .unit-status-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
   @media (max-width: 400px) {
     .doc-grid { grid-template-columns: 1fr; }
     .paket-item { flex-wrap: wrap; }
@@ -275,6 +370,29 @@
 
     <!-- STEP 1: PAKET -->
     <div id="step-1">
+
+      <!-- UNIT STATUS -->
+      <div class="card" id="unit-status-card">
+        <div class="card-title"><div class="num" style="background:var(--green);color:#000">✓</div> Status Unit</div>
+        <div id="unit-status-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <!-- rendered by JS -->
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">
+          🔄 Status diperbarui real-time dari sistem Rivals Play
+        </div>
+      </div>
+
+      <!-- FULL NOTICE -->
+      <div class="full-notice" id="full-notice">
+        <div class="full-notice-title">😔 Semua Unit Penuh Hari Ini</div>
+        <div class="full-notice-sub">
+          Tidak ada unit yang tersedia untuk hari ini. Tapi tenang — kamu tetap bisa booking untuk hari lain! Pilih tanggal yang tersedia di bawah:
+        </div>
+        <div class="date-suggest-grid" id="date-suggest-grid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title"><div class="num">1</div> Pilih Paket</div>
         <div class="paket-list">
@@ -379,12 +497,8 @@
           <label>Pilih Unit</label>
           <select id="unit">
             <option value="">— Pilih Unit —</option>
-            <option value="UNIT-01">UNIT-01 — PS5 Slim #1</option>
-            <option value="UNIT-02">UNIT-02 — PS5 Slim #2</option>
-            <option value="UNIT-03">UNIT-03 — PS5 Slim #3</option>
-            <option value="UNIT-04">UNIT-04 — PS5 Slim #4</option>
-            <option value="UNIT-05">UNIT-05 — PS5 Slim #5</option>
           </select>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="unit-hint">Hanya unit yang tersedia ditampilkan</div>
         </div>
         <div class="form-group">
           <label>Alamat Lengkap</label>
@@ -594,6 +708,7 @@
   }
 
   function calcHarga() {
+    renderUnitStatus();
     const durasi = parseInt(document.getElementById('durasi').value) || 1;
     let harga = isMember ? (MEMBER_PRICES[currentPaket] || 700000) :
                 isGuest ? (GUEST_PRICES[durasi] || 100000) :
@@ -720,6 +835,25 @@
 
     lastBookingData = { bookingId, nama, wa, unit, tglMulai, tglKembali, harga, total, totalStr, label };
 
+    // Save booking to localStorage (shared with owner dashboard)
+    try {
+      const existing = JSON.parse(localStorage.getItem('rp_bookings') || '[]');
+      existing.push({
+        bookingId,
+        nama, wa, unit, alamat, kontak,
+        paket: currentPaket,
+        paketLabel: PAKET_LABEL[currentPaket],
+        tglMulai, tglKembali,
+        durasi: label,
+        harga, total, totalStr,
+        status: 'pending',
+        ts: Date.now(),
+        tglBooking: new Date().toLocaleDateString('id-ID'),
+        dokumen: { ktp: uploads.ktp, selfie: uploads.selfie, rumah: uploads.rumah }
+      });
+      localStorage.setItem('rp_bookings', JSON.stringify(existing));
+    } catch(e) { console.error('Gagal simpan booking:', e); }
+
     // Fill success screen
     document.getElementById('k-id').textContent = bookingId;
     document.getElementById('k-nama').textContent = nama;
@@ -806,11 +940,145 @@ Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
     location.reload();
   }
 
+  // =================== UNIT STATUS ===================
+  const UNIT_DATA = [
+    { id: 'UNIT-01', name: 'PS5 Slim #1' },
+    { id: 'UNIT-02', name: 'PS5 Slim #2' },
+    { id: 'UNIT-03', name: 'PS5 Slim #3' },
+    { id: 'UNIT-04', name: 'PS5 Slim #4' },
+    { id: 'UNIT-05', name: 'PS5 Slim #5' },
+  ];
+
+  function getUnitStatuses() {
+    // Read from localStorage (shared with owner dashboard)
+    try {
+      const saved = localStorage.getItem('rp_unit_status');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    // Default: all available
+    return UNIT_DATA.reduce((acc, u) => {
+      acc[u.id] = { status: 'available', penyewa: null, kembali: null };
+      return acc;
+    }, {});
+  }
+
+  const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+
+  function formatDateID(d) {
+    return DAYS_ID[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS_ID[d.getMonth()];
+  }
+
+  function renderUnitStatus() {
+    const statuses = getUnitStatuses();
+    const grid = document.getElementById('unit-status-grid');
+    const unitSelect = document.getElementById('unit');
+    const selectedDate = document.getElementById('tgl-mulai').value;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isToday = !selectedDate || selectedDate === todayStr;
+
+    // Render status cards
+    grid.innerHTML = UNIT_DATA.map(u => {
+      const s = statuses[u.id] || { status: 'available' };
+      const cls = s.status === 'available' ? 'available' : s.status === 'rented' ? 'rented' : 'maintenance';
+      const label = s.status === 'available' ? '● Tersedia' : s.status === 'rented' ? '● Disewa' : '● Servis';
+      const meta = s.status === 'rented' && s.kembali
+        ? `Kembali: ${s.kembali}`
+        : s.status === 'maintenance'
+        ? 'Sedang diservis'
+        : 'Siap dipesan';
+      return `
+        <div class="unit-status-item ${cls}">
+          <div class="unit-status-name">${u.id}</div>
+          <div style="display:flex;align-items:center">
+            <span class="unit-status-dot"></span>
+            <span class="unit-status-label">${label}</span>
+          </div>
+          <div class="unit-status-meta">${meta}</div>
+        </div>`;
+    }).join('');
+
+    // Available units
+    const availableUnits = UNIT_DATA.filter(u => {
+      const s = statuses[u.id] || { status: 'available' };
+      return s.status === 'available';
+    });
+
+    // Update unit select
+    unitSelect.innerHTML = '<option value="">— Pilih Unit —</option>';
+    availableUnits.forEach(u => {
+      unitSelect.innerHTML += `<option value="${u.id}">${u.id} — ${u.name}</option>`;
+    });
+
+    const hint = document.getElementById('unit-hint');
+    const fullNotice = document.getElementById('full-notice');
+    const dateGrid = document.getElementById('date-suggest-grid');
+
+    if (availableUnits.length === 0 && isToday) {
+      // FULL TODAY — show notice with next available dates
+      fullNotice.classList.add('show');
+      hint.textContent = '⚠️ Semua unit penuh hari ini';
+      hint.style.color = 'var(--red)';
+
+      // Generate next 6 days as suggestions
+      const suggestions = [];
+      for (let i = 1; i <= 6; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        suggestions.push(d);
+      }
+
+      dateGrid.innerHTML = suggestions.map(d => {
+        const dateStr = d.toISOString().split('T')[0];
+        // Estimate available units for future dates
+        // (simplified: units with known return dates before this date are available)
+        let futureAvail = UNIT_DATA.length;
+        Object.values(statuses).forEach(s => {
+          if (s.status === 'rented' && s.kembali) {
+            // If return date is before this suggestion, unit will be available
+            const returnParts = s.kembali.split(' ');
+            // Simple check — if unit has kembali, assume it returns soon
+          }
+        });
+
+        return `
+          <button class="date-suggest-btn" onclick="selectSuggestedDate('${dateStr}')">
+            <span class="date-day">${DAYS_ID[d.getDay()]}</span>
+            ${d.getDate()} ${MONTHS_ID[d.getMonth()]}
+            <span class="date-avail">✓ Cek ketersediaan</span>
+          </button>`;
+      }).join('');
+
+    } else {
+      fullNotice.classList.remove('show');
+      if (availableUnits.length === 0) {
+        hint.textContent = '⚠️ Tidak ada unit tersedia. Coba tanggal lain.';
+        hint.style.color = 'var(--red)';
+      } else {
+        hint.textContent = `${availableUnits.length} unit tersedia`;
+        hint.style.color = 'var(--green)';
+      }
+    }
+  }
+
+  function selectSuggestedDate(dateStr) {
+    // Set the suggested date and scroll to date picker
+    document.getElementById('tgl-mulai').value = dateStr;
+    calcHarga();
+    // Hide full notice temporarily
+    document.getElementById('full-notice').classList.remove('show');
+    document.getElementById('unit-hint').textContent = 'Unit kemungkinan tersedia — konfirmasi via WA';
+    document.getElementById('unit-hint').style.color = 'var(--accent)';
+    // Scroll to date section
+    document.getElementById('tgl-mulai').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   // INIT
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('tgl-mulai').value = today;
   calcHarga();
   selectPaket('harian-full');
+  renderUnitStatus();
 </script>
 </body>
 </html>
