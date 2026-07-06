@@ -915,7 +915,7 @@
         <div class="unit-number">UNIT-01</div>
         <div class="unit-name">PS5 Slim #1</div>
         <div class="unit-status">● Tersedia</div>
-        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>3 Game Fisik</div>
+        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>Game Digital Siap Main</div>
         <button class="unit-action" onclick="openBookingModal('UNIT-01')">Booking</button>
       </div>
 
@@ -923,7 +923,7 @@
         <div class="unit-number">UNIT-02</div>
         <div class="unit-name">PS5 Slim #2</div>
         <div class="unit-status">● Tersedia</div>
-        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>3 Game Fisik</div>
+        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>Game Digital Siap Main</div>
         <button class="unit-action" onclick="openBookingModal('UNIT-02')">Booking</button>
       </div>
 
@@ -931,7 +931,7 @@
         <div class="unit-number">UNIT-03</div>
         <div class="unit-name">PS5 Slim #3</div>
         <div class="unit-status">● Tersedia</div>
-        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>3 Game Fisik</div>
+        <div class="unit-info">Monitor 24" FHD<br>2 Controller<br>Game Digital Siap Main</div>
         <button class="unit-action" onclick="openBookingModal('UNIT-03')">Booking</button>
       </div>
 
@@ -963,32 +963,14 @@
         <div class="paket-icon">🎮</div>
         <div class="paket-name">Harian Full</div>
         <div class="paket-price">Rp 150.000/hari</div>
-        <div class="paket-desc">Akun PSN sendiri<br>Online ✓ Trophy ✓</div>
+        <div class="paket-desc">PS+ Deluxe (400+ game)<br>+ FC 26 · online ✓</div>
       </div>
-      <div class="paket-card" id="paket-harian-guest" onclick="selectPaket('harian-guest')">
-        <div class="paket-icon">👤</div>
-        <div class="paket-name">Harian Guest</div>
-        <div class="paket-price">Rp 100.000/hari</div>
-        <div class="paket-desc">Tanpa akun PSN<br>Offline only ✗</div>
-      </div>
-      <div class="paket-card" id="paket-member-basic" onclick="selectPaket('member-basic')">
-        <div class="paket-icon">🥉</div>
-        <div class="paket-name">Member Basic</div>
-        <div class="paket-price">Rp 700.000/bln</div>
-        <div class="paket-desc">Akun PSN sendiri<br>3 game fisik</div>
-      </div>
-      <div class="paket-card" id="paket-member-plus" onclick="selectPaket('member-plus')">
+      <div class="paket-card" id="paket-member" onclick="selectPaket('member')">
         <div class="paket-badge">POPULER</div>
-        <div class="paket-icon">🥈</div>
-        <div class="paket-name">Member Plus</div>
-        <div class="paket-price">Rp 850.000/bln</div>
-        <div class="paket-desc">+ PS Plus Essential<br>3 game fisik</div>
-      </div>
-      <div class="paket-card" id="paket-member-premium" onclick="selectPaket('member-premium')">
-        <div class="paket-icon">🥇</div>
-        <div class="paket-name">Member Premium</div>
-        <div class="paket-price">Rp 1.000.000/bln</div>
-        <div class="paket-desc">+ PS Plus Premium<br>3 game fisik</div>
+        <div class="paket-icon">👑</div>
+        <div class="paket-name">Member Bulanan</div>
+        <div class="paket-price">Rp 1.500.000/bln</div>
+        <div class="paket-desc">PS+ Deluxe + FC 26<br>Tier naik = diskon s/d 150rb</div>
       </div>
       <div class="paket-card" id="paket-member-mifi" onclick="selectPaket('member-mifi')">
         <div class="paket-icon">📶</div>
@@ -1003,10 +985,6 @@
       📶 <div><strong>Penting!</strong> Unit <strong>tidak dilengkapi internet</strong>. Untuk bermain online, siapkan hotspot dari HP lo sendiri, atau tambahkan paket MiFi (+Rp 15rb/hari).</div>
     </div>
 
-    <!-- NOTICE GUEST -->
-    <div class="notice-box guest" id="notice-guest" style="display:none">
-      ⚠️ <div><strong>Mode Guest — Keterbatasan:</strong> Tidak bisa main online multiplayer · Trophy tidak tersimpan · Save data hilang setelah sesi berakhir · Tidak bisa akses PS Store.</div>
-    </div>
 
     <!-- NOTICE PSN -->
     <div class="notice-box psn" id="notice-psn" style="display:none">
@@ -1138,10 +1116,6 @@
       <div class="ack-item">
         <input type="checkbox" id="ack-internet" onchange="checkAck()">
         <label for="ack-internet">Saya mengerti bahwa unit <strong>tidak dilengkapi koneksi internet</strong>. Saya wajib menyediakan hotspot/WiFi sendiri jika ingin bermain online.</label>
-      </div>
-      <div class="ack-item" id="ack-guest-item" style="display:none">
-        <input type="checkbox" id="ack-guest" onchange="checkAck()">
-        <label for="ack-guest">Saya memilih mode <strong>Guest (Offline)</strong> dan memahami bahwa tidak bisa main online, trophy tidak tersimpan, dan save data akan hilang setelah sesi berakhir.</label>
       </div>
       <div class="ack-item" id="ack-psn-item" style="display:none">
         <input type="checkbox" id="ack-psn" onchange="checkAck()">
@@ -1323,14 +1297,12 @@
 
 <script>
   const prices = { 1: 150000, 2: 280000, 3: 390000, 7: 850000 };
-  const guestPrices = { 1: 100000, 2: 190000, 3: 270000, 7: 600000 };
+  const MEMBER_PRICE = 1500000; // base tier Bronze, diskon naik seiring tier
   let currentPaket = 'harian-full';
-  let isGuest = false;
   let isMember = false;
 
   function selectPaket(paket) {
     currentPaket = paket;
-    isGuest = paket === 'harian-guest';
     isMember = paket.startsWith('member');
 
     // Update card styles
@@ -1338,19 +1310,13 @@
       c.classList.remove('selected','selected-guest');
     });
     const card = document.getElementById('paket-' + paket);
-    if (card) card.classList.add(isGuest ? 'selected-guest' : 'selected');
+    if (card) card.classList.add('selected');
 
     // Show/hide notices
     document.getElementById('notice-internet').style.display = 'flex';
-    document.getElementById('notice-guest').style.display = isGuest ? 'flex' : 'none';
-    document.getElementById('notice-psn').style.display = !isGuest ? 'flex' : 'none';
-
-    // Show/hide ack items
-    document.getElementById('ack-guest-item').style.display = isGuest ? 'flex' : 'none';
-    document.getElementById('ack-psn-item').style.display = !isGuest ? 'flex' : 'none';
+    document.getElementById('notice-psn').style.display = 'flex';
 
     // Show/hide durasi for member (monthly)
-    const durasiGroup = document.getElementById('durasi').closest('.form-group');
     if (isMember) {
       document.getElementById('durasi').innerHTML = '<option value="30">1 Bulan</option><option value="60">2 Bulan</option><option value="90">3 Bulan</option>';
     } else {
@@ -1358,7 +1324,6 @@
     }
 
     // Reset ack checkboxes
-    document.getElementById('ack-guest').checked = false;
     document.getElementById('ack-psn').checked = false;
     checkAck();
     calcPrice();
@@ -1367,9 +1332,8 @@
   function checkAck() {
     const internet = document.getElementById('ack-internet').checked;
     const tnc = document.getElementById('ack-tnc').checked;
-    const guest = isGuest ? document.getElementById('ack-guest').checked : true;
-    const psn = !isGuest ? document.getElementById('ack-psn').checked : true;
-    const allChecked = internet && tnc && guest && psn;
+    const psn = document.getElementById('ack-psn').checked;
+    const allChecked = internet && tnc && psn;
     const btn = document.getElementById('submit-btn');
     btn.disabled = !allChecked;
     btn.style.opacity = allChecked ? '1' : '0.4';
@@ -1389,9 +1353,7 @@
 
   function calcPrice() {
     const durasi = parseInt(document.getElementById('durasi').value);
-    const priceMap = isGuest ? guestPrices : prices;
-    const memberPriceMap = { 'member-basic': 700000, 'member-plus': 850000, 'member-premium': 1000000 };
-    let harga = isMember ? (memberPriceMap[currentPaket] || 700000) : (priceMap[durasi] || 150000);
+    let harga = isMember ? MEMBER_PRICE : (prices[durasi] || 150000);
     const total = harga + ONGKIR + DEPOSIT;
     const label = isMember ? (durasi/30) + ' bulan' : durasi + ' hari';
 
@@ -1724,12 +1686,8 @@ _Rivals Play Purwokerto_`;
   // =================== KONTRAK ===================
   let lastBooking = null;
   const PAKET_LABEL = {
-    'harian-full': 'Harian Full (Akun PSN Sendiri)',
-    'harian-guest': 'Harian Guest (Offline)',
-    'member-basic': 'Member Basic',
-    'member-plus': 'Member Plus (+ PS Plus Essential)',
-    'member-premium': 'Member Premium (+ PS Plus Premium)',
-    'member-mifi': 'Add-on MiFi'
+    'harian-full': 'Harian Full',
+    'member': 'Member Bulanan'
   };
 
   function showKontrak(data) {

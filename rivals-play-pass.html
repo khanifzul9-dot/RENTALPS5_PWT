@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rivals Play Pass</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #14141c;
+    --surface2: #1c1c26;
+    --border: #2a2a38;
+    --text: #f0f0f5;
+    --muted: #8888a0;
+    --accent: #00d9ff;
+    --accent-dim: rgba(0,217,255,0.12);
+    --green: #22e584;
+    --green-dim: rgba(34,229,132,0.12);
+    --yellow: #ffcc33;
+    --yellow-dim: rgba(255,204,51,0.12);
+    --red: #ff4466;
+    --red-dim: rgba(255,68,102,0.12);
+    --purple: #b47bff;
+    --purple-dim: rgba(180,123,255,0.12);
+    --gold: #ffd700;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'SF Mono', 'Roboto Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding-bottom: 40px;
+  }
+
+  .wrap { max-width: 540px; margin: 0 auto; padding: 0 16px; }
+
+  /* HEADER */
+  .app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header-inner { max-width: 540px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .app-logo { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .app-name { font-size: 17px; font-weight: 800; }
+  .app-name span { color: var(--accent); }
+  .app-tag { font-size: 11px; color: var(--muted); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, rgba(0,217,255,0.08), rgba(180,123,255,0.06));
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin: 20px 0;
+    border: 1px solid var(--border);
+  }
+  .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; line-height: 1.25; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hero-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 11px; font-weight: 600; }
+
+  /* SECTION */
+  .section-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 14px; }
+
+  /* PASS CARDS */
+  .pass-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .pass-card:hover { border-color: var(--muted); }
+  .pass-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .pass-card.story.selected { border-color: var(--purple); background: var(--purple-dim); }
+  .pass-card.competitive.selected { border-color: var(--red); background: var(--red-dim); }
+  .pass-card.casual.selected { border-color: var(--green); background: var(--green-dim); }
+
+  .pass-badge { position: absolute; top: -10px; right: 16px; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+  .pass-badge.popular { background: var(--green); color: #000; }
+
+  .pass-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .pass-icon { font-size: 32px; }
+  .pass-name { font-size: 18px; font-weight: 800; }
+  .pass-for { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .pass-price { text-align: right; }
+  .pass-price .amount { font-size: 20px; font-weight: 800; font-family: var(--mono); color: var(--accent); }
+  .pass-price .period { font-size: 11px; color: var(--muted); }
+  .pass-card.story .pass-price .amount { color: var(--purple); }
+  .pass-card.competitive .pass-price .amount { color: var(--red); }
+  .pass-card.casual .pass-price .amount { color: var(--green); }
+
+  .pass-specs { display: flex; flex-direction: column; gap: 8px; }
+  .pass-spec { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .pass-spec .spec-ico { width: 22px; text-align: center; }
+  .pass-deposit { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .pass-deposit strong { color: var(--yellow); }
+
+  /* INFO BOX */
+  .info-box {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .info-box.yellow { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+  .info-box.green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+  /* FORM */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 14px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px; font-family: var(--font);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+
+  .checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .checkbox-row input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--accent); }
+  .checkbox-row label { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+  /* BUTTON */
+  .btn {
+    width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: var(--font); transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+
+  /* SUMMARY */
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row.total { font-size: 16px; font-weight: 800; padding-top: 12px; }
+  .summary-row.total .val { color: var(--accent); font-family: var(--mono); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; margin: 20px 0; overflow-x: auto; padding-bottom: 4px; }
+  .tab { padding: 10px 18px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: var(--font); }
+  .tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ACTIVE PASS CARD */
+  .active-pass {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px;
+  }
+  .active-pass-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .active-pass-name { font-size: 16px; font-weight: 800; }
+  .active-pass-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+  .badge.aktif { background: var(--green-dim); color: var(--green); }
+  .badge.deposit-held { background: var(--yellow-dim); color: var(--yellow); }
+  .badge.deposit-returned { background: var(--green-dim); color: var(--green); }
+  .badge.trusted { background: var(--purple-dim); color: var(--purple); }
+
+  .progress-bar { height: 8px; background: var(--surface2); border-radius: 10px; overflow: hidden; margin: 12px 0 6px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 10px; transition: width 0.4s; }
+  .progress-label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+
+  .deposit-info { background: var(--surface2); border-radius: 10px; padding: 12px 14px; margin-top: 12px; font-size: 12px; }
+  .deposit-info-row { display: flex; justify-content: space-between; padding: 4px 0; }
+
+  .active-pass-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .active-pass-actions button { flex: 1; padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+
+  .empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 14px; }
+
+  /* STEP INDICATOR */
+  .steps { display: flex; align-items: center; margin: 20px 0; }
+  .step { flex: 1; text-align: center; position: relative; }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; margin: 0 auto 4px; }
+  .step.active .step-num { background: var(--accent); color: #000; border-color: var(--accent); }
+  .step.done .step-num { background: var(--green); color: #000; border-color: var(--green); }
+  .step-label { font-size: 10px; color: var(--muted); }
+  .step.active .step-label { color: var(--accent); }
+  .step-line { position: absolute; top: 15px; left: 50%; width: 100%; height: 1px; background: var(--border); z-index: -1; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-header-inner">
+    <div class="app-logo">🎟️</div>
+    <div>
+      <div class="app-name">Rivals <span>Play</span> Pass</div>
+      <div class="app-tag">Upgrade setup PS5-mu tanpa beli mahal</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('daftar')">🎟️ Ambil Pass</button>
+    <button class="tab" onclick="switchTab('aktif')">📋 Pass Saya</button>
+    <button class="tab" onclick="switchTab('info')">ℹ️ Cara Kerja</button>
+  </div>
+
+  <!-- ============ PANEL: DAFTAR ============ -->
+  <div class="panel active" id="panel-daftar">
+
+    <div class="hero">
+      <h1>Punya PS5, tapi <span>setup kurang maksimal?</span></h1>
+      <p>Rivals Play Pass — sewa bulanan monitor gaming, controller pro, plus PS Plus. Khusus buat kamu yang udah punya konsol sendiri. Diantar ke rumah!</p>
+      <div class="hero-pills">
+        <div class="hero-pill">📺 Monitor Gaming</div>
+        <div class="hero-pill">🎮 Controller Pro</div>
+        <div class="hero-pill">⭐ PS Plus</div>
+        <div class="hero-pill">🚗 Antar-jemput</div>
+      </div>
+    </div>
+
+    <div class="info-box yellow">
+      ⚠️ <strong>Syarat:</strong> Rivals Play Pass khusus buat yang <strong>sudah punya PS5 sendiri</strong>. Kalau belum punya konsol, mending sewa unit lengkap di layanan Rental Konsol Rivals Play.
+    </div>
+
+    <div class="section-title">Pilih Pass</div>
+
+    <!-- STORY PASS -->
+    <div class="pass-card story" id="pass-story" onclick="selectPass('story')">
+      <div class="pass-head">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="pass-icon">🎬</div>
+          <div>
+            <div class="pass-name">Story Pass</div>
+            <div class="pass-for">Buat penikmat grafis & single-player</div>
+          </div>
+        </div>
+        <div class="pass-price">
+          <div class="amount">350rb</div>
+          <div class="period">/bulan</div>
+        </div>
+      </div>
+      <div class="pass-specs">
+        <div class="pass-spec"><span class="spec-ico">📺</span> Monitor 4K 32" (visual maksimal)</div>
+        <div class="pass-spec"><span class="spec-ico">🎮</span> DualSense standar</div>
+        <div class="pass-spec"><span class="spec-ico">🎟️</span> Opsi voucher PSN (langganan PS+ sendiri)</div>
+        <div class="pass-spec"><span class="spec-ico">👕</span> <strong style="color:var(--gold)">GRATIS Jersey Rivals Play</strong> (welcome kit)</div>
+      </div>
+      <div class="pass-deposit">💰 Deposit jaminan: <strong>Rp 500.000</strong> (balik penuh)</div>
+    </div>
+
+    <!-- COMPETITIVE PASS -->
+    <div class="pass-card competitive" id="pass-competitive" onclick="selectPass('competitive')">
+      <div class="pass-badge popular">Populer</div>
+      <div class="pass-head">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="pass-icon">⚔️</div>
+          <div>
+            <div class="pass-name">Competitive Pass</div>
+            <div class="pass-for">Buat ranked: FC 26, Tekken, COD</div>
+          </div>
+        </div>
+        <div class="pass-price">
+          <div class="amount">450rb</div>
+          <div class="period">/bulan</div>
+        </div>
+      </div>
+      <div class="pass-specs">
+        <div class="pass-spec"><span class="spec-ico">📺</span> Monitor 120Hz 24"/27" (response cepat)</div>
+        <div class="pass-spec"><span class="spec-ico">🎮</span> DualSense Edge (paddle + trigger stop)</div>
+        <div class="pass-spec"><span class="spec-ico">🎟️</span> Opsi voucher PSN (langganan PS+ sendiri)</div>
+        <div class="pass-spec"><span class="spec-ico">👕</span> <strong style="color:var(--gold)">GRATIS Jersey Rivals Play</strong> (welcome kit)</div>
+      </div>
+      <div class="pass-deposit">💰 Deposit jaminan: <strong>Rp 500.000</strong> (balik penuh)</div>
+    </div>
+
+    <!-- CASUAL PASS -->
+    <div class="pass-card casual" id="pass-casual" onclick="selectPass('casual')">
+      <div class="pass-head">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="pass-icon">🎮</div>
+          <div>
+            <div class="pass-name">Casual Pass</div>
+            <div class="pass-for">Upgrade ringan, budget hemat</div>
+          </div>
+        </div>
+        <div class="pass-price">
+          <div class="amount">250rb</div>
+          <div class="period">/bulan</div>
+        </div>
+      </div>
+      <div class="pass-specs">
+        <div class="pass-spec"><span class="spec-ico">📺</span> Monitor 24" FHD</div>
+        <div class="pass-spec"><span class="spec-ico">🎮</span> DualSense standar</div>
+        <div class="pass-spec"><span class="spec-ico">🎟️</span> Opsi voucher PSN (langganan PS+ sendiri)</div>
+        <div class="pass-spec"><span class="spec-ico">👕</span> <strong style="color:var(--gold)">GRATIS Jersey Rivals Play</strong> (welcome kit)</div>
+      </div>
+      <div class="pass-deposit">💰 Deposit jaminan: <strong>Rp 300.000</strong> (balik penuh)</div>
+    </div>
+
+    <!-- FORM (hidden until pass selected) -->
+    <div id="daftar-form" class="hidden">
+      <div class="section-title">Data Pendaftaran</div>
+
+      <div class="card">
+        <div class="checkbox-row">
+          <input type="checkbox" id="confirm-ps5" onchange="validateForm()">
+          <label><strong>Saya konfirmasi sudah punya PS5 sendiri.</strong> Rivals Play Pass hanya menyewakan monitor, controller, dan PS Plus — bukan konsol.</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="nama" placeholder="Nama sesuai KTP" oninput="validateForm()">
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp</label>
+          <input type="tel" id="wa" placeholder="08xxxxxxxxxx" oninput="validateForm()">
+        </div>
+        <div class="form-group">
+          <label>Alamat Lengkap (buat antar-jemput)</label>
+          <textarea id="alamat" placeholder="Jl. ... , Kelurahan, Kecamatan, Purwokerto" oninput="validateForm()"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tipe PS5 yang kamu punya</label>
+          <select id="tipe-ps5">
+            <option value="PS5 Slim Disc">PS5 Slim (Disc Edition)</option>
+            <option value="PS5 Slim Digital">PS5 Slim (Digital Edition)</option>
+            <option value="PS5 Pro">PS5 Pro</option>
+            <option value="PS5 Original">PS5 Original (launch model)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Mulai Pass</label>
+          <input type="date" id="tgl-mulai" oninput="validateForm()">
+        </div>
+        <div class="form-group">
+          <label>👕 Ukuran Jersey (welcome kit gratis)</label>
+          <select id="jersey-size">
+            <option value="S">S</option>
+            <option value="M" selected>M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="checkbox-row">
+          <input type="checkbox" id="is-alumni" onchange="calcSummary()">
+          <label>Saya alumni program ownership Rivals Play (dapat diskon 10%)</label>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="card">
+        <div class="section-title" style="margin-top:0">Ringkasan</div>
+        <div class="summary-row"><span>Pass dipilih</span><span class="val" id="sum-pass">—</span></div>
+        <div class="summary-row"><span>Biaya bulanan</span><span class="val" id="sum-monthly">—</span></div>
+        <div class="summary-row" id="row-discount" style="display:none"><span>Diskon alumni (10%)</span><span class="val" style="color:var(--green)" id="sum-discount">—</span></div>
+        <div class="summary-row"><span>Deposit jaminan (sekali, balik)</span><span class="val" id="sum-deposit">—</span></div>
+        <div class="summary-row total"><span>Bayar awal</span><span class="val" id="sum-total">—</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">💡 Total di atas = Pass (aksesoris) + deposit. Voucher PSN (kalau mau) dibeli terpisah sesuai tier PS+ yang kamu pilih.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+          * Bayar awal = deposit + bulan pertama. Bulan berikutnya cukup bayar biaya bulanan.
+        </div>
+      </div>
+
+      <div class="info-box" style="background:rgba(255,215,0,0.1);border-color:var(--gold);color:var(--gold)">
+        👕 <strong>Bonus Welcome Kit!</strong> Setiap Pass dapat Jersey Rivals Play gratis, diantar bareng hardware pas pengiriman pertama. Pakai jerseynya, jadi bagian dari tim! 🎮
+      </div>
+
+      <div class="info-box green">
+        💡 <strong>Deposit pasti balik!</strong> Berhenti kapan aja → deposit dikembalikan asal hardware utuh. Genap 1 tahun → deposit balik & Pass lanjut tanpa perlu deposit lagi (cukup jaminan identitas).
+      </div>
+
+      <div class="info-box" style="background:rgba(255,215,0,0.1);border-color:var(--gold);color:var(--gold)">
+        👕 <strong>Welcome Kit:</strong> Setiap Pass dapat <strong>Jersey Rivals Play</strong> gratis, diantar bareng hardware di pengiriman pertama. Selamat bergabung jadi bagian tim!
+      </div>
+
+      <button class="btn btn-primary" id="submit-btn" onclick="submitPass()" disabled>Ajukan Pass via WhatsApp</button>
+    </div>
+
+  </div>
+
+  <!-- ============ PANEL: PASS AKTIF ============ -->
+  <div class="panel" id="panel-aktif">
+    <div class="section-title">Pass Saya</div>
+    <div id="active-pass-list">
+      <div class="empty">Belum ada Pass aktif. Ambil Pass dulu di tab "Ambil Pass".</div>
+    </div>
+  </div>
+
+  <!-- ============ PANEL: INFO ============ -->
+  <div class="panel" id="panel-info">
+    <div class="section-title">Cara Kerja Rivals Play Pass</div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">🎟️ Apa itu Rivals Play Pass?</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">
+        Layanan sewa bulanan buat kamu yang <strong style="color:var(--text)">udah punya PS5 sendiri</strong> tapi mau upgrade pengalaman gaming. Sewa monitor gaming, controller pro, plus PS Plus — tanpa harus beli mahal. Semua diantar ke rumah.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">💰 Sistem Deposit</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        <div style="margin-bottom:8px">1️⃣ Bayar deposit jaminan di awal (Rp 300-500rb sesuai Pass)</div>
+        <div style="margin-bottom:8px">2️⃣ Deposit <strong style="color:var(--green)">PASTI balik</strong> — bukan hangus</div>
+        <div style="margin-bottom:8px">3️⃣ Berhenti kapan aja → deposit balik asal hardware utuh</div>
+        <div style="margin-bottom:8px">4️⃣ Kalau ada kerusakan → deposit dipotong biaya servis</div>
+        <div>5️⃣ Genap <strong style="color:var(--accent)">1 tahun</strong> → deposit dikembalikan & Pass lanjut <strong style="color:var(--text)">tanpa deposit lagi</strong> (cukup identitas, karena udah terpercaya)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">📺 3 Pilihan Pass</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        <div style="margin-bottom:10px"><strong style="color:var(--purple)">🎬 Story Pass</strong> — monitor 4K 32" buat nikmatin grafis game single-player kayak God of War, Spider-Man.</div>
+        <div style="margin-bottom:10px"><strong style="color:var(--red)">⚔️ Competitive Pass</strong> — monitor 120Hz + DualSense Edge buat kamu yang serius di ranked FC 26, Tekken, COD.</div>
+        <div><strong style="color:var(--green)">🎮 Casual Pass</strong> — upgrade ringan dengan monitor 24" FHD, budget lebih hemat.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">🎟️ Voucher PSN (Opsional — Harga Terpisah)</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        <div style="margin-bottom:8px">⚠️ <strong style="color:var(--yellow)">Harga Pass = sewa aksesoris doang</strong> (monitor + controller). Voucher PSN <strong style="color:var(--text)">dibeli terpisah</strong>, gak termasuk di harga Pass.</div>
+        <div style="margin-bottom:8px">💡 <strong style="color:var(--gold)">Rivals Play bantu beliin voucher PSN</strong> — kamu redeem di akun sendiri, PS+ atas nama kamu. Aman, gak ada sharing akun.</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-top:12px;font-size:12px;line-height:1.8">
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px">Harga Voucher PSN (per tahun):</div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>PS+ Essential <span style="color:var(--muted)">(online + monthly games)</span></span><span style="font-family:var(--mono);color:var(--accent)">~750rb</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>PS+ Extra <span style="color:var(--muted)">(+ 400+ game)</span></span><span style="font-family:var(--mono);color:var(--accent)">1,71jt</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0"><span>PS+ Deluxe <span style="color:var(--muted)">(+ game klasik)</span></span><span style="font-family:var(--mono);color:var(--accent)">1,99jt</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px">* Harga voucher sesuai PS Store. Rivals Play bantu beliin tanpa markup gede — anggap layanan pelengkap biar kamu gak ribet.</div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">👕 Welcome Kit</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">
+        Setiap customer Pass dapat <strong style="color:var(--gold)">Jersey Rivals Play gratis</strong> sebagai welcome kit, diantar bareng hardware pas pengiriman pertama. Pilih ukuran S sampai XXL waktu daftar. Pakai jerseynya, tunjukkin kamu bagian dari keluarga Rivals Play! 🎮
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px">👕 Welcome Kit</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7">
+        Setiap Pass dapat <strong style="color:var(--gold)">Jersey Rivals Play</strong> gratis sebagai welcome kit, diantar bareng hardware di pengiriman pertama. Pilih ukuran pas daftar. Pakai jersey-nya & jadi bagian dari tim! 🎮
+      </p>
+    </div>
+
+    <div class="info-box">
+      🎓 <strong>Alumni program ownership</strong> dapat diskon 10% + prioritas booking. Terima kasih udah jadi bagian keluarga Rivals Play!
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const OWNER_WA = '6281234567890'; // GANTI dengan nomor asli saat launch
+
+  const PASS_DATA = {
+    story:       { name: 'Story Pass', icon: '🎬', monthly: 350000, deposit: 500000, monitor: 'Monitor 4K 32"', controller: 'DualSense standar', voucher: 'Opsi voucher PSN (langganan sendiri)' },
+    competitive: { name: 'Competitive Pass', icon: '⚔️', monthly: 450000, deposit: 500000, monitor: 'Monitor 120Hz 24"/27"', controller: 'DualSense Edge', voucher: 'Opsi voucher PSN (langganan sendiri)' },
+    casual:      { name: 'Casual Pass', icon: '🎮', monthly: 250000, deposit: 300000, monitor: 'Monitor 24" FHD', controller: 'DualSense standar', voucher: 'Opsi voucher PSN (langganan sendiri)' }
+  };
+
+  let selectedPass = null;
+
+  function rupiah(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+  function selectPass(pass) {
+    selectedPass = pass;
+    ['story','competitive','casual'].forEach(p => {
+      document.getElementById('pass-' + p).classList.toggle('selected', p === pass);
+    });
+    document.getElementById('daftar-form').classList.remove('hidden');
+    calcSummary();
+    validateForm();
+    document.getElementById('daftar-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function calcSummary() {
+    if (!selectedPass) return;
+    const p = PASS_DATA[selectedPass];
+    const isAlumni = document.getElementById('is-alumni').checked;
+    let monthly = p.monthly;
+    let discount = 0;
+    if (isAlumni) { discount = Math.round(monthly * 0.1); monthly = monthly - discount; }
+
+    document.getElementById('sum-pass').textContent = p.name;
+    document.getElementById('sum-monthly').textContent = rupiah(p.monthly);
+    document.getElementById('sum-deposit').textContent = rupiah(p.deposit);
+
+    const rowDisc = document.getElementById('row-discount');
+    if (isAlumni) {
+      rowDisc.style.display = 'flex';
+      document.getElementById('sum-discount').textContent = '- ' + rupiah(discount);
+    } else {
+      rowDisc.style.display = 'none';
+    }
+
+    const total = p.deposit + monthly;
+    document.getElementById('sum-total').textContent = rupiah(total);
+  }
+
+  function validateForm() {
+    const ps5 = document.getElementById('confirm-ps5').checked;
+    const nama = document.getElementById('nama').value.trim();
+    const wa = document.getElementById('wa').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const tgl = document.getElementById('tgl-mulai').value;
+    const valid = selectedPass && ps5 && nama && wa && alamat && tgl;
+    document.getElementById('submit-btn').disabled = !valid;
+  }
+
+  function submitPass() {
+    const p = PASS_DATA[selectedPass];
+    const nama = document.getElementById('nama').value.trim();
+    const wa = document.getElementById('wa').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const tipePs5 = document.getElementById('tipe-ps5').value;
+    const tglMulai = document.getElementById('tgl-mulai').value;
+    const jerseySize = document.getElementById('jersey-size').value;
+    const isAlumni = document.getElementById('is-alumni').checked;
+
+    let monthly = p.monthly;
+    let discount = 0;
+    if (isAlumni) { discount = Math.round(monthly * 0.1); monthly = monthly - discount; }
+    const total = p.deposit + monthly;
+
+    const passId = '#PASS' + Date.now().toString().slice(-5);
+
+    // Save to localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('rp_passes') || '[]');
+      existing.push({
+        passId, pass: selectedPass, passName: p.name,
+        nama, wa, alamat, tipePs5, tglMulai, jerseySize, isAlumni,
+        monthly, deposit: p.deposit, discount,
+        status: 'pending',
+        depositStatus: 'held',
+        ts: Date.now(),
+        tglDaftar: new Date().toLocaleDateString('id-ID')
+      });
+      localStorage.setItem('rp_passes', JSON.stringify(existing));
+    } catch(e) { console.error(e); }
+
+    // WA message
+    const msg =
+`🎟️ *PENGAJUAN RIVALS PLAY PASS*
+━━━━━━━━━━━━━━━━
+📋 ID: ${passId}
+👤 ${nama}
+📱 ${wa}
+📍 ${alamat}
+🎮 PS5: ${tipePs5}
+${isAlumni ? '🎓 Alumni (diskon 10%)\n' : ''}━━━━━━━━━━━━━━━━
+${p.icon} *${p.name}*
+📺 ${p.monitor}
+🎮 ${p.controller}
+🎟️ ${p.voucher}
+📅 Mulai: ${tglMulai}
+👕 Jersey size: ${jerseySize} (welcome kit gratis)
+━━━━━━━━━━━━━━━━
+💰 Biaya bulanan: ${rupiah(monthly)}${isAlumni ? ' (setelah diskon)' : ''}
+💰 Deposit jaminan: ${rupiah(p.deposit)}
+💵 *Bayar awal: ${rupiah(total)}*
+━━━━━━━━━━━━━━━━
+Deposit balik penuh asal hardware utuh. Genap 1 tahun → deposit dikembalikan, Pass lanjut tanpa deposit.
+
+Mohon konfirmasi ketersediaan & jadwal antar. Terima kasih! 🎮`;
+
+    window.open('https://wa.me/' + OWNER_WA + '?text=' + encodeURIComponent(msg), '_blank');
+
+    alert('✅ Pengajuan terkirim! Lanjutkan di WhatsApp untuk konfirmasi.');
+    switchTab('aktif');
+    renderActivePasses();
+  }
+
+  // ===== TABS =====
+  function switchTab(name) {
+    const tabs = ['daftar','aktif','info'];
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'aktif') renderActivePasses();
+  }
+
+  // ===== ACTIVE PASSES =====
+  function getPasses() {
+    try { return JSON.parse(localStorage.getItem('rp_passes') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function monthsSince(dateStr) {
+    const start = new Date(dateStr);
+    const now = new Date();
+    let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+    if (now.getDate() < start.getDate()) months--;
+    return Math.max(0, months);
+  }
+
+  function renderActivePasses() {
+    const passes = getPasses().sort((a,b) => b.ts - a.ts);
+    const container = document.getElementById('active-pass-list');
+    if (!passes.length) {
+      container.innerHTML = '<div class="empty">Belum ada Pass aktif. Ambil Pass dulu di tab "Ambil Pass".</div>';
+      return;
+    }
+
+    container.innerHTML = passes.map(pass => {
+      const p = PASS_DATA[pass.pass] || {};
+      const months = monthsSince(pass.tglMulai);
+      const pct = Math.min(100, Math.round((months / 12) * 100));
+      const isTrusted = months >= 12;
+
+      const statusBadge = pass.status === 'pending'
+        ? '<span class="badge deposit-held">⏳ Menunggu Konfirmasi</span>'
+        : '<span class="badge aktif">🟢 Aktif</span>';
+
+      const depositBadge = isTrusted
+        ? '<span class="badge deposit-returned">✓ Deposit Dikembalikan</span>'
+        : '<span class="badge deposit-held">💰 Deposit Ditahan</span>';
+
+      const trustedNote = isTrusted
+        ? `<div class="info-box green" style="margin-top:12px;margin-bottom:0">🎉 <strong>Selamat! Kamu sudah member terpercaya (${months} bulan).</strong> Deposit ${rupiah(pass.deposit)} sudah bisa dikembalikan. Pass lanjut tanpa perlu deposit lagi — cukup jaminan identitas.</div>`
+        : `<div class="progress-label" style="margin-top:8px"><span>Loyalitas: bulan ke-${months}</span><span>${12 - months} bulan lagi deposit balik</span></div>`;
+
+      return `
+        <div class="active-pass">
+          <div class="active-pass-head">
+            <div>
+              <div class="active-pass-name">${p.icon || '🎟️'} ${pass.passName}</div>
+              <div class="active-pass-meta">${pass.passId} · ${pass.nama}</div>
+              <div class="active-pass-meta">Mulai: ${pass.tglMulai}</div>
+            </div>
+            <div style="text-align:right">${statusBadge}</div>
+          </div>
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            ${depositBadge}
+            ${isTrusted ? '<span class="badge trusted">⭐ Terpercaya</span>' : ''}
+          </div>
+
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          ${trustedNote}
+
+          <div class="deposit-info">
+            <div class="deposit-info-row"><span style="color:var(--muted)">Biaya bulanan</span><span>${rupiah(pass.monthly)}</span></div>
+            <div class="deposit-info-row"><span style="color:var(--muted)">Deposit jaminan</span><span>${rupiah(pass.deposit)}</span></div>
+            <div class="deposit-info-row"><span style="color:var(--muted)">Isi Pass</span><span>${p.monitor || '—'}</span></div>
+            <div class="deposit-info-row"><span style="color:var(--muted)">👕 Jersey</span><span>${pass.jerseySize ? 'Size ' + pass.jerseySize : '—'}</span></div>
+          </div>
+
+          <div class="active-pass-actions">
+            <button onclick="contactOwner('${pass.wa}')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)">💬 Hubungi Rivals Play</button>
+            ${isTrusted ? `<button onclick="requestDepositBack('${pass.passId}')" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green)">💰  Minta Deposit</button>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function contactOwner(wa) {
+    window.open('https://wa.me/' + OWNER_WA, '_blank');
+  }
+
+  function requestDepositBack(passId) {
+    const passes = getPasses();
+    const pass = passes.find(x => x.passId === passId);
+    if (!pass) return;
+    const msg =
+`💰 *PERMINTAAN PENGEMBALIAN DEPOSIT*
+📋 ${pass.passId}
+👤 ${pass.nama}
+${PASS_DATA[pass.pass].icon} ${pass.passName}
+
+Saya sudah menjadi member Pass selama 1 tahun lebih dan ingin mengajukan pengembalian deposit ${rupiah(pass.deposit)}. Pass tetap lanjut tanpa deposit ya. Terima kasih!`;
+    window.open('https://wa.me/' + OWNER_WA + '?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  // INIT
+  document.getElementById('tgl-mulai').value = new Date().toISOString().split('T')[0];
+</script>
+
+</body>
+</html>

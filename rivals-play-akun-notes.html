@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rivals Play — Notes Akun PSN & Email</title>
+<style>
+  :root {
+    --bg: #0a0c11; --surface: #14171f; --surface2: #1b2029; --border: #2a303c;
+    --text: #eef1f6; --muted: #7c8698;
+    --cyan: #00d9ff; --cyan-dim: rgba(0,217,255,0.1);
+    --green: #22e584; --green-dim: rgba(34,229,132,0.1);
+    --yellow: #ffcc33; --yellow-dim: rgba(255,204,51,0.1);
+    --red: #ff4466; --red-dim: rgba(255,68,102,0.1);
+    --purple: #b47bff; --purple-dim: rgba(180,123,255,0.1);
+    --mono: 'SF Mono','Roboto Mono',ui-monospace,monospace;
+    --sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 50px; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+
+  .head { padding: 36px 16px 24px; text-align: center; background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 70%); }
+  .head-badge { display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--cyan); border:1px solid var(--cyan); border-radius:20px; padding:5px 14px; margin-bottom:16px; }
+  .head h1 { font-size:26px; font-weight:900; letter-spacing:-0.5px; line-height:1.15; }
+  .head h1 span { color: var(--cyan); }
+  .head p { font-size:13px; color:var(--muted); margin-top:10px; }
+
+  .toc { display:flex; gap:6px; margin:20px 0; overflow-x:auto; padding-bottom:4px; }
+  .toc a { padding:8px 14px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); font-size:12px; font-weight:700; white-space:nowrap; text-decoration:none; }
+
+  .section-title { font-size:13px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:0.5px; margin:28px 0 14px; display:flex; align-items:center; gap:8px; scroll-margin-top:16px; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px; }
+  .card h3 { font-size:15px; font-weight:800; margin-bottom:10px; }
+  .card p { font-size:13px; color:var(--muted); margin-bottom:8px; }
+
+  .mono-block { font-family:var(--mono); font-size:12px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px; margin:10px 0; line-height:1.7; overflow-x:auto; white-space:pre; color:var(--text); }
+
+  .step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(42,48,60,0.6); }
+  .step:last-child { border-bottom:none; }
+  .step-num { flex-shrink:0; width:24px; height:24px; border-radius:50%; background:var(--cyan-dim); border:1px solid var(--cyan); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; font-family:var(--mono); }
+  .step-text { font-size:13px; }
+  .step-text strong { color:var(--text); }
+  .step-text span { color:var(--muted); }
+
+  .checklist { list-style:none; }
+  .checklist li { display:flex; gap:10px; align-items:flex-start; padding:7px 0; font-size:13px; }
+  .checklist li::before { content:'✓'; color:var(--green); font-weight:800; flex-shrink:0; }
+
+  .warn-box { background:var(--red-dim); border:1px solid var(--red); border-radius:12px; padding:14px 16px; font-size:12px; color:#ff8fa3; line-height:1.7; margin:12px 0; }
+  .warn-box strong { color:var(--red); }
+  .info-box { background:var(--cyan-dim); border:1px solid var(--cyan); border-radius:12px; padding:14px 16px; font-size:12px; color:var(--cyan); line-height:1.7; margin:12px 0; }
+  .ok-box { background:var(--green-dim); border:1px solid var(--green); border-radius:12px; padding:14px 16px; font-size:12px; color:var(--green); line-height:1.7; margin:12px 0; }
+
+  .tag { display:inline-block; font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); margin-right:4px; }
+
+  table { width:100%; border-collapse:collapse; font-size:12px; margin:10px 0; }
+  th { text-align:left; padding:8px; color:var(--muted); border-bottom:1px solid var(--border); font-family:var(--mono); font-size:11px; }
+  td { padding:8px; border-bottom:1px solid rgba(42,48,60,0.5); font-family:var(--mono); }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="head-badge">Notes · Teknis</div>
+  <h1>Akun PSN & <span>Email</span></h1>
+  <p>Panduan manajemen akun unit Rivals Play — verified & siap eksekusi</p>
+</div>
+
+<div class="wrap">
+
+  <div class="toc">
+    <a href="#konsep">Konsep</a>
+    <a href="#email">Email Beranak</a>
+    <a href="#psn">Akun PSN</a>
+    <a href="#keamanan">Keamanan</a>
+    <a href="#legal">Legalitas</a>
+  </div>
+
+  <!-- KONSEP -->
+  <div class="section-title" id="konsep">🎯 Konsep Dasar</div>
+  <div class="card">
+    <h3>Model Akun per Unit</h3>
+    <p>Tiap unit PS5 punya 1 akun PSN sendiri (RP-01 s/d RP-XX) yang berfungsi sebagai <strong style="color:var(--text)">primary console</strong>. Akun ini yang langganan PS+ Deluxe & beli game magnet (FC 26).</p>
+    <div class="mono-block">UNIT-01 → Akun PSN RP-01 (primary console)
+         ├── PS+ Deluxe (400+ game catalog)
+         └── FC 26 (game magnet, beli)
+
+Customer login akun SENDIRI di unit
+  ├── Main game via primary console
+  ├── Dapat online MP (warisan PS+ unit)
+  ├── GAK perlu PS+ sendiri ✅ (TESTED)
+  └── Save & trophy masuk akun customer</div>
+    <div class="ok-box">✅ <strong>Terverifikasi:</strong> Akun tanpa PS+ bisa main online di primary console. Sudah ditest langsung di konsol.</div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="section-title" id="email">📧 Email "Beranak" (+tag)</div>
+  <div class="card">
+    <h3>1 Email Induk → Unlimited Anak</h3>
+    <p>Sony butuh 1 email unik per akun PSN. Tapi Gmail +tag bikin 1 email induk bisa "beranak" jadi tak terbatas — semua masuk 1 inbox.</p>
+    <div class="mono-block">rivalsplay@gmail.com  (INDUK)
+     ├── rivalsplay+rp01@gmail.com → RP-01
+     ├── rivalsplay+rp02@gmail.com → RP-02
+     ├── rivalsplay+rp03@gmail.com → RP-03
+     └── ...UNLIMITED (tinggal +rpXX)</div>
+    <div class="info-box">💡 <strong>+tag Gmail = UNLIMITED.</strong> Mau 5 unit atau 500 unit, semua dari 1 Gmail induk. Sony baca sebagai email beda, tapi semua notif masuk 1 inbox.</div>
+    <p style="margin-top:12px"><strong style="color:var(--text)">Multi-kota nanti:</strong> pakai kode kota</p>
+    <div class="mono-block">+pwt01 (Purwokerto unit 1)
++clp01 (Cilacap unit 1)
++pbg01 (Purbalingga unit 1)</div>
+  </div>
+
+  <div class="card">
+    <h3>Filter Otomatis Gmail</h3>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Gmail Settings</strong> <span>→ Filters → Create new filter</span></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Kolom "To":</strong> <span>rivalsplay+rp01@gmail.com</span></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Apply label</strong> <span>"UNIT 01" → notif auto masuk folder</span></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Ulangi per unit</strong> <span>→ inbox rapi terorganisir</span></div></div>
+  </div>
+
+  <!-- AKUN PSN -->
+  <div class="section-title" id="psn">🎮 Bikin Akun PSN</div>
+  <div class="card">
+    <h3>Langkah Pembuatan</h3>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>PS5:</strong> <span>Settings → Users and Accounts → Add User → Create Account</span></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Email:</strong> <span>rivalsplay+rp01@gmail.com (anak email)</span></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Region:</strong> <span>Indonesia (WAJIB — biar bisa top-up lokal)</span></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Tanggal lahir:</strong> <span>18+ (biar gak kena parental control)</span></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><strong>PSN ID:</strong> <span>RivalsPlayRP01 (atau nama unit)</span></div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Verifikasi:</strong> <span>link masuk ke inbox induk → klik → aktif</span></div></div>
+    <div class="ok-box">✅ <strong>Terverifikasi:</strong> Bikin akun PSN pakai anak email (+tag) berhasil. Sudah ditest langsung.</div>
+  </div>
+
+  <div class="card">
+    <h3>Setelah Akun Jadi — Set Primary Console</h3>
+    <div class="mono-block">Settings → Users and Accounts → Other →
+Console Sharing and Offline Play → Enable</div>
+    <p>Ini yang bikin game & PS+ akun unit bisa "dipinjam" customer yang login akun sendiri di unit itu.</p>
+    <div class="warn-box">⚠️ <strong>1 akun = 1 primary console.</strong> Makanya 1 akun per unit — biar gak bentrok. 5 unit bisa jalan online barengan (5 akun beda).</div>
+  </div>
+
+  <!-- KEAMANAN -->
+  <div class="section-title" id="keamanan">🔐 Keamanan</div>
+  <div class="card">
+    <h3>Checklist Wajib per Akun</h3>
+    <ul class="checklist">
+      <li><strong>2FA aktif</strong> — pertahanan #1, ganti password butuh kode HP owner</li>
+      <li><strong>Password kuat & UNIK</strong> per unit (RP-01 ≠ RP-02)</li>
+      <li><strong>TANPA kartu kredit</strong> tersimpan — PS+ top-up manual</li>
+      <li><strong>Email induk super aman</strong> — 2FA di Gmail induk juga</li>
+      <li><strong>Parental/restrictions</strong> — customer gak bisa ubah setting akun unit</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Kenapa Aman dari Customer Nakal</h3>
+    <p>Model primary console = aman by design. Customer <strong style="color:var(--text)">login akun mereka sendiri</strong>, bukan akun unit. Mereka gak perlu & gak tau password akun unit.</p>
+    <div class="warn-box">⚠️ <strong>Gmail induk = kunci segalanya.</strong> Kalau induk jebol, semua akun unit kena. Jaga 2FA + password kuat + recovery aman.</div>
+  </div>
+
+  <div class="card">
+    <h3>Template Catatan Akun (simpan di password manager)</h3>
+    <table>
+      <thead><tr><th>Unit</th><th>Email</th><th>PSN ID</th><th>Pass</th></tr></thead>
+      <tbody>
+        <tr><td>RP01</td><td>+rp01</td><td>RivalsPlayRP01</td><td>***</td></tr>
+        <tr><td>RP02</td><td>+rp02</td><td>RivalsPlayRP02</td><td>***</td></tr>
+        <tr><td>RP03</td><td>+rp03</td><td>RivalsPlayRP03</td><td>***</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">💡 Simpan di password manager (Bitwarden gratis, dll), JANGAN di notes HP biasa.</div>
+  </div>
+
+  <!-- LEGALITAS -->
+  <div class="section-title" id="legal">⚖️ Legalitas & Etika</div>
+  <div class="card">
+    <h3>Status Model</h3>
+    <p>Model Rivals Play <strong style="color:var(--green)">90% legit</strong> — beli konsol, PS+, & game semua resmi. Area abu-abu (PS+ sharing komersial) kecil & pakai fitur legal (console sharing yang Sony sediakan).</p>
+    <ul class="checklist">
+      <li>Beli konsol resmi → Sony dapat revenue hardware</li>
+      <li>Langganan PS+ Deluxe resmi → ~2jt/thn/unit ke Sony</li>
+      <li>Beli game resmi → Sony dapat cut</li>
+      <li>Funnel customer baru ke ekosistem PS</li>
+    </ul>
+    <div class="info-box">💡 <strong>Jauh lebih bersih</strong> dari warnet bajakan (jailbreak + game bajakan = Sony dapat NOL). Rental konsol = industri legal puluhan tahun.</div>
+  </div>
+
+  <div class="card">
+    <h3>Jalur 100% Clean (Endgame)</h3>
+    <p><strong style="color:var(--text)">PCPP (PlayStation Commercial Partner Program)</strong> — jalur resmi buat bisnis komersial PS. Kalau Rivals Play udah gede, daftar jadi partner resmi → 100% legit + dukungan Sony.</p>
+    <div class="warn-box">⚠️ <strong>Yang dihindari:</strong> jangan skala "pabrik akun" ekstrem, jangan jual-beli akun. 1 akun per unit, skala wajar.</div>
+  </div>
+
+  <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+    <strong style="color:var(--cyan)">Rivals Play</strong> — Notes teknis akun & email<br>
+    Semua poin terverifikasi langsung di konsol & Gmail 🎯
+  </div>
+
+</div>
+
+</body>
+</html>

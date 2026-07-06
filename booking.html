@@ -94,6 +94,18 @@
   .paket-item-price { font-size: 14px; font-weight: 800; font-family: var(--mono); color: var(--accent); flex-shrink: 0; }
   .paket-item.selected-guest .paket-item-price { color: var(--yellow); }
 
+  .paket-link {
+    border-style: dashed !important;
+    border-color: var(--purple, #b47bff) !important;
+    background: rgba(180,123,255,0.06);
+  }
+  .paket-link:hover {
+    border-color: var(--purple, #b47bff) !important;
+    background: rgba(180,123,255,0.12);
+    transform: translateX(2px);
+  }
+  .paket-link .paket-item-price { color: var(--purple, #b47bff); }
+
   .paket-badge {
     position: absolute;
     top: -8px; right: 12px;
@@ -222,6 +234,67 @@
   /* FOOTER */
   .footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 20px; }
 
+  /* GAME CATALOG */
+  .unit-games-toggle {
+    font-size: 10px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 6px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .game-catalog-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+    padding: 0;
+  }
+
+  .game-catalog-modal.show { display: flex; }
+
+  .game-catalog-sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 540px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 24px 20px 40px;
+    border-top: 2px solid var(--accent);
+  }
+
+  .catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .catalog-title { font-size: 18px; font-weight: 800; }
+  .catalog-title span { color: var(--accent); }
+  .catalog-close { background: var(--surface2); border: none; color: var(--text); width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; }
+
+  .catalog-game-grid { display: flex; flex-direction: column; gap: 8px; }
+  .catalog-game-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .catalog-game-item .game-num { color: var(--muted); font-size: 12px; font-family: var(--mono); min-width: 24px; }
+
+  .catalog-empty { text-align: center; color: var(--muted); padding: 30px; font-size: 13px; }
+
   /* FULL NOTICE */
   .full-notice {
     background: linear-gradient(135deg, rgba(255,23,68,0.08), rgba(255,109,0,0.05));
@@ -335,7 +408,7 @@
   <div class="hero-pills">
     <div class="hero-pill green">✓ Unit Lengkap</div>
     <div class="hero-pill accent">✓ Include Monitor</div>
-    <div class="hero-pill">✓ 3 Game Fisik</div>
+    <div class="hero-pill">✓ Game Siap Main</div>
     <div class="hero-pill">✓ 2 Controller</div>
   </div>
 </div>
@@ -401,47 +474,29 @@
             <div class="paket-item-icon">🎮</div>
             <div class="paket-item-info">
               <div class="paket-item-name">Harian Full</div>
-              <div class="paket-item-desc">Akun PSN sendiri · Online ✓ · Trophy ✓ · Save data aman</div>
+              <div class="paket-item-desc">PS+ Deluxe (400+ game) + FC 26 · main pakai akun sendiri / unit · online ✓</div>
             </div>
             <div class="paket-item-price">Rp 150rb/hari</div>
           </div>
 
-          <div class="paket-item" id="p-harian-guest" onclick="selectPaket('harian-guest')">
-            <div class="paket-item-icon">👤</div>
+          <div class="paket-item" id="p-member" onclick="selectPaket('member')">
+            <div class="paket-item-icon">👑</div>
             <div class="paket-item-info">
-              <div class="paket-item-name">Harian Guest</div>
-              <div class="paket-item-desc">Tanpa akun PSN · Offline only · Lebih hemat</div>
+              <div class="paket-item-name">Member Bulanan</div>
+              <div class="paket-item-desc">Unit di rumah sebulan · PS+ Deluxe + FC 26 · tier naik otomatis (diskon s/d 150rb)</div>
             </div>
-            <div class="paket-item-price" style="color:var(--yellow)">Rp 100rb/hari</div>
+            <div class="paket-item-price">Rp 1,5jt/bln</div>
           </div>
 
-          <div class="paket-item" id="p-member-basic" onclick="selectPaket('member-basic')">
-            <div class="paket-item-icon">🥉</div>
+          <a href="rivals-play-pass.html" class="paket-item paket-link" style="text-decoration:none;color:inherit">
+            <div class="paket-item-icon">🎟️</div>
             <div class="paket-item-info">
-              <div class="paket-item-name">Member Basic</div>
-              <div class="paket-item-desc">Bulanan · Akun PSN sendiri · 3 slot game · 2x tukar/bln</div>
+              <div class="paket-item-name">Rivals Play Pass <span style="font-size:10px;background:var(--purple,#b47bff);color:#fff;padding:2px 7px;border-radius:6px;margin-left:4px">PUNYA PS5?</span></div>
+              <div class="paket-item-desc">Udah punya PS5 sendiri? Sewa upgrade aksesoris (monitor + controller pro) bulanan →</div>
             </div>
-            <div class="paket-item-price">Rp 700rb/bln</div>
-          </div>
+            <div class="paket-item-price" style="font-size:18px">→</div>
+          </a>
 
-          <div class="paket-item" id="p-member-plus" onclick="selectPaket('member-plus')">
-            <div class="paket-badge">POPULER</div>
-            <div class="paket-item-icon">🥈</div>
-            <div class="paket-item-info">
-              <div class="paket-item-name">Member Plus</div>
-              <div class="paket-item-desc">Bulanan · + PS Plus Essential · 4 slot game · 3x tukar/bln</div>
-            </div>
-            <div class="paket-item-price">Rp 850rb/bln</div>
-          </div>
-
-          <div class="paket-item" id="p-member-premium" onclick="selectPaket('member-premium')">
-            <div class="paket-item-icon">🥇</div>
-            <div class="paket-item-info">
-              <div class="paket-item-name">Member Premium</div>
-              <div class="paket-item-desc">Bulanan · + PS Plus Premium · 5 slot game · 4x tukar/bln · Early access</div>
-            </div>
-            <div class="paket-item-price">Rp 1jt/bln</div>
-          </div>
 
         </div>
       </div>
@@ -471,11 +526,8 @@
       <div class="notice info" id="n-internet">
         📶 <div><strong>Tidak ada WiFi di unit.</strong> Siapkan hotspot HP kamu sendiri untuk main online. Atau tambah MiFi +Rp 15rb/hari saat checkout.</div>
       </div>
-      <div class="notice warn" id="n-guest" style="display:none">
-        ⚠️ <div><strong>Mode Guest:</strong> Tidak bisa main online · Trophy tidak tersimpan · Save data hilang setelah selesai · Tidak bisa akses PS Store.</div>
-      </div>
       <div class="notice success" id="n-psn" style="display:none">
-        ✅ <div><strong>Pakai akun PSN kamu sendiri.</strong> Progress game, trophy, dan save data tersimpan di akunmu. Jangan lupa logout setelah selesai!</div>
+        ✅ <div><strong>PS+ Deluxe (400+ game) + FC 26 siap main.</strong> Bebas pakai akun PSN sendiri (progress & trophy tersimpan) atau akun unit (langsung main). Online multiplayer aktif tanpa perlu PS+ sendiri!</div>
       </div>
 
       <button class="submit-btn" onclick="goStep(2)">Lanjut →</button>
@@ -591,13 +643,9 @@
             <input type="checkbox" id="ack-internet" onchange="checkAllAck()">
             <label for="ack-internet">Saya mengerti unit <strong>tidak dilengkapi internet</strong>. Saya siapkan hotspot sendiri untuk main online.</label>
           </div>
-          <div class="ack-item" id="ack-guest-wrap" style="display:none">
-            <input type="checkbox" id="ack-guest" onchange="checkAllAck()">
-            <label for="ack-guest">Saya memilih mode <strong>Guest (Offline)</strong> dan memahami keterbatasannya: tidak bisa online, trophy & save data tidak tersimpan.</label>
-          </div>
           <div class="ack-item" id="ack-psn-wrap" style="display:none">
             <input type="checkbox" id="ack-psn" onchange="checkAllAck()">
-            <label for="ack-psn">Saya akan login dengan <strong>akun PSN saya sendiri</strong> dan berkomitmen logout setelah sesi selesai.</label>
+            <label for="ack-psn">Saya paham unit sudah include <strong>PS+ Deluxe + FC 26</strong>. Kalau login akun PSN sendiri, saya berkomitmen logout setelah sesi selesai.</label>
           </div>
           <div class="ack-item">
             <input type="checkbox" id="ack-tnc" onchange="checkAllAck()">
@@ -658,20 +706,15 @@
 
   const PAKET_LABEL = {
     'harian-full': 'Harian Full',
-    'harian-guest': 'Harian Guest (Offline)',
-    'member-basic': 'Member Basic',
-    'member-plus': 'Member Plus (+ PS Plus Essential)',
-    'member-premium': 'Member Premium (+ PS Plus Premium)'
+    'member': 'Member Bulanan'
   };
 
   const HARIAN_PRICES = { 1:150000, 2:280000, 3:390000, 7:850000 };
-  const GUEST_PRICES = { 1:100000, 2:190000, 3:270000, 7:600000 };
-  const MEMBER_PRICES = { 'member-basic':700000, 'member-plus':850000, 'member-premium':1000000 };
+  const MEMBER_PRICE = 1500000; // base tier Bronze, diskon naik seiring tier
   const ONGKIR = 20000;
   const DEPOSIT = 200000;
 
   let currentPaket = 'harian-full';
-  let isGuest = false;
   let isMember = false;
   let uploads = { ktp: false, selfie: false, rumah: false };
   let currentStep = 1;
@@ -679,18 +722,17 @@
 
   function selectPaket(paket) {
     currentPaket = paket;
-    isGuest = paket === 'harian-guest';
+    // guest dihapus
     isMember = paket.startsWith('member');
 
     document.querySelectorAll('.paket-item').forEach(el => {
       el.classList.remove('selected', 'selected-guest');
     });
     const el = document.getElementById('p-' + paket);
-    if (el) el.classList.add(isGuest ? 'selected-guest' : 'selected');
+    if (el) el.classList.add('selected');
 
     // Update notices
-    document.getElementById('n-guest').style.display = isGuest ? 'flex' : 'none';
-    document.getElementById('n-psn').style.display = !isGuest ? 'flex' : 'none';
+    document.getElementById('n-psn').style.display = !isMember ? 'flex' : 'none';
 
     // Update durasi options
     const dur = document.getElementById('durasi');
@@ -701,8 +743,7 @@
     }
 
     // Ack boxes
-    document.getElementById('ack-guest-wrap').style.display = isGuest ? 'flex' : 'none';
-    document.getElementById('ack-psn-wrap').style.display = !isGuest ? 'flex' : 'none';
+    document.getElementById('ack-psn-wrap').style.display = !isMember ? 'flex' : 'none';
 
     calcHarga();
   }
@@ -710,8 +751,7 @@
   function calcHarga() {
     renderUnitStatus();
     const durasi = parseInt(document.getElementById('durasi').value) || 1;
-    let harga = isMember ? (MEMBER_PRICES[currentPaket] || 700000) :
-                isGuest ? (GUEST_PRICES[durasi] || 100000) :
+    let harga = isMember ? MEMBER_PRICE :
                 (HARIAN_PRICES[durasi] || 150000);
 
     const total = harga + ONGKIR + DEPOSIT;
@@ -815,9 +855,8 @@
     const internet = document.getElementById('ack-internet').checked;
     const tnc = document.getElementById('ack-tnc').checked;
     const telat = document.getElementById('ack-telat').checked;
-    const guest = isGuest ? document.getElementById('ack-guest').checked : true;
-    const psn = !isGuest ? document.getElementById('ack-psn').checked : true;
-    const ok = internet && tnc && telat && guest && psn;
+    const psn = !isMember ? document.getElementById('ack-psn').checked : true;
+    const ok = internet && tnc && telat && psn;
     document.getElementById('btn-submit').disabled = !ok;
   }
 
@@ -969,6 +1008,62 @@ Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
     return DAYS_ID[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS_ID[d.getMonth()];
   }
 
+  // ===== GAME CATALOG =====
+  function getUnitGames() {
+    // Try to read real data from member system (rp_unit_games keyed by memberId)
+    // mapped to units via rp_members. Owner can also set rp_unit_games_display directly.
+    try {
+      const direct = localStorage.getItem('rp_unit_games_display');
+      if (direct) {
+        const parsed = JSON.parse(direct);
+        if (parsed && Object.keys(parsed).length) return parsed;
+      }
+    } catch(e) {}
+
+    // Try mapping from member system: members have .unit and .memberId
+    try {
+      const members = JSON.parse(localStorage.getItem('rp_members') || '[]');
+      const unitGames = JSON.parse(localStorage.getItem('rp_unit_games') || '{}');
+      if (members.length && Object.keys(unitGames).length) {
+        const result = {};
+        members.forEach(m => {
+          if (m.unit && unitGames[m.memberId]) {
+            result[m.unit] = unitGames[m.memberId];
+          }
+        });
+        if (Object.keys(result).length) return result;
+      }
+    } catch(e) {}
+
+    // Fallback demo games per unit (buat preview sebelum ada data real)
+    return {
+      'UNIT-01': ['FC 26', 'GTA V', 'Spider-Man 2', 'God of War Ragnarök', 'Tekken 8'],
+      'UNIT-02': ['FC 26', 'Mortal Kombat 1', 'Gran Turismo 7', 'Elden Ring'],
+      'UNIT-03': ['Call of Duty MW3', 'FC 26', 'Hogwarts Legacy', 'Ghost of Tsushima', 'Horizon FW', 'The Last of Us II'],
+      'UNIT-04': ['FC 26', 'NBA 2K26', 'Resident Evil 4', 'Assassin\'s Creed Mirage'],
+      'UNIT-05': ['FC 26', 'Cyberpunk 2077', 'Spider-Man 2', 'Mortal Kombat 1', 'Gran Turismo 7'],
+    };
+  }
+
+  function openGameCatalog(unitId, unitName) {
+    const games = getUnitGames()[unitId] || [];
+    document.getElementById('catalog-unit-name').textContent = unitName || unitId;
+    const list = document.getElementById('catalog-game-list');
+    if (!games.length) {
+      list.innerHTML = '<div class="catalog-empty">Belum ada info game untuk unit ini. Hubungi kami via WA untuk detail.</div>';
+    } else {
+      list.innerHTML = '<div class="catalog-game-grid">' + games.map((g, i) =>
+        `<div class="catalog-game-item"><span class="game-num">${String(i+1).padStart(2,'0')}</span>🎮 ${g}</div>`
+      ).join('') + '</div>' +
+      `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">${games.length} game siap main di unit ini 🎉</div>`;
+    }
+    document.getElementById('game-catalog-modal').classList.add('show');
+  }
+
+  function closeGameCatalog() {
+    document.getElementById('game-catalog-modal').classList.remove('show');
+  }
+
   function renderUnitStatus() {
     const statuses = getUnitStatuses();
     const grid = document.getElementById('unit-status-grid');
@@ -987,6 +1082,10 @@ Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
         : s.status === 'maintenance'
         ? 'Sedang diservis'
         : 'Siap dipesan';
+      const gameCount = (getUnitGames()[u.id] || []).length;
+      const gameToggle = gameCount > 0
+        ? `<span class="unit-games-toggle" onclick="event.stopPropagation();openGameCatalog('${u.id}','${u.name}')">🎮 ${gameCount} game — lihat</span>`
+        : '';
       return `
         <div class="unit-status-item ${cls}">
           <div class="unit-status-name">${u.id}</div>
@@ -995,6 +1094,7 @@ Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
             <span class="unit-status-label">${label}</span>
           </div>
           <div class="unit-status-meta">${meta}</div>
+          ${gameToggle}
         </div>`;
     }).join('');
 
@@ -1080,5 +1180,17 @@ Catatan: Unit tidak ada internet. Wajib logout PSN. Terlambat +Rp 50rb/hari.`;
   selectPaket('harian-full');
   renderUnitStatus();
 </script>
+
+<!-- GAME CATALOG MODAL -->
+<div class="game-catalog-modal" id="game-catalog-modal" onclick="if(event.target===this)closeGameCatalog()">
+  <div class="game-catalog-sheet">
+    <div class="catalog-header">
+      <div class="catalog-title">🎮 Game di <span id="catalog-unit-name">Unit</span></div>
+      <button class="catalog-close" onclick="closeGameCatalog()">✕</button>
+    </div>
+    <div id="catalog-game-list"></div>
+  </div>
+</div>
+
 </body>
 </html>
