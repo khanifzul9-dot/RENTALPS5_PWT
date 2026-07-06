@@ -1,0 +1,30 @@
+{
+  "name": "Rivals Play — Book and Play",
+  "short_name": "Rivals Play",
+  "description": "Rental PS5 antar-jemput Purwokerto. Book and Play!",
+  "start_url": "./booking.html",
+  "display": "standalone",
+  "background_color": "#0a0c11",
+  "theme_color": "#00d9ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./rivals-play-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./rivals-play-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./rivals-play-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
